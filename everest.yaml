@@ -1,0 +1,7 @@
+- Name: ARandomizerMod
+  Version: 0.1.0
+  Dependencies:
+    - Name: Everest
+      Version: 1.3471.0
+    - Name: ExtendedVariantMode
+      Version: 0.27.0
