@@ -3,3 +3,4 @@ namespace Celeste.Mod.ARandomizerMod {
         public bool ExampleSwitch { get; set; } = false;
     }
 }
+ 

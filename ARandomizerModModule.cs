@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using Microsoft.Xna.Framework;
+using MonoMod.ModInterop;
 
 namespace Celeste.Mod.ARandomizerMod {
     public class ARandomizerModModule : EverestModule {
@@ -16,7 +18,7 @@ namespace Celeste.Mod.ARandomizerMod {
             Instance = this;
 #if DEBUG
             // debug builds use verbose logging
-            Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Verbose);
+            Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Info);
 #else
             // release builds use info logging to reduce spam in log files
             Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Info);
@@ -24,8 +26,22 @@ namespace Celeste.Mod.ARandomizerMod {
         }
 
         public override void Load() {
-            // TODO: apply any hooks that should always be active
+            On.Celeste.Level.TransitionRoutine += TestLoadVariant;
+            On.Celeste.Player.WallJumpCheck += NoWallJump;
+            typeof(ExtendedVariantImports).ModInterop();
         }
+
+        private bool NoWallJump(On.Celeste.Player.orig_WallJumpCheck orig, Player self, int dir)
+        {
+            return false;
+        }
+
+        private IEnumerator TestLoadVariant(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
+        {
+            ExtendedVariantImports.TriggerBooleanVariant.Invoke("AlwaysInvisible", true, false);
+            return orig(self, next, direction);
+        }
+
 
         public override void Unload() {
             // TODO: unapply any hooks applied in Load()
