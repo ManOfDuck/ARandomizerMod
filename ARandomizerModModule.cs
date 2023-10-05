@@ -14,7 +14,7 @@ namespace Celeste.Mod.ARandomizerMod {
         public override Type SessionType => typeof(ARandomizerModModuleSession);
         public static ARandomizerModModuleSession Session => (ARandomizerModModuleSession)Instance._Session;
 
-        UI ui;
+        VaraintsUI ui;
 
         public ARandomizerModModule()
         {
@@ -28,39 +28,47 @@ namespace Celeste.Mod.ARandomizerMod {
 #endif
         }
 
-        public override void Load() {
-            On.Celeste.Level.TransitionRoutine += TestLoadVariant;
-            On.Celeste.Level.Render += LevelRender;
+        public override void Load() {;
             typeof(ExtendedVariantImports).ModInterop();
+            On.Celeste.Level.LoadLevel += LevelLoad;
+            On.Celeste.Level.Update += LevelUpdate;
+            //On.Celeste.Player.Update += PlayerUpdate;
 
         }
 
-        private IEnumerator TestLoadVariant(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
+        private void LevelLoad(On.Celeste.Level.orig_LoadLevel orig, Level self, Player.IntroTypes playerIntro, bool isFromLoader)
         {
-            //ExtendedVariantImports.TriggerBooleanVariant.Invoke("AlwaysInvisible", true, false);
-            //ui.Active = true;
-            return orig(self, next, direction);
-        }
-
-        private void LevelRender(On.Celeste.Level.orig_Render orig, Level self)
-        {
-            orig(self);
-            if (Engine.Scene is not Level level)
-                return;
             if (ui == null)
             {
-                ui = new UI
+                ui = new VaraintsUI
                 {
-                    Active = true
+                    Active = false
                 };
             }
+        }
 
-            level.Add(ui);
+        private void LevelUpdate(On.Celeste.Level.orig_Update orig, Level self)
+        {
+            if (ARandomizerModModule.Settings.OpenVariantsMenu.Check)
+            {
+                ui.render = true;
+            }
+            else
+            {
+                ui.render = false;
+                orig(self);
+            }
+        }
+
+        private void PlayerUpdate(On.Celeste.Player.orig_Update orig, Player self)
+        {
+            if (ARandomizerModModule.Settings.OpenVariantsMenu.Check)
+                orig(self);
         }
 
         public override void Unload()
         {
-
+        
         }
     }
 }
