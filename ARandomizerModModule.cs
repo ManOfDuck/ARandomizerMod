@@ -31,39 +31,23 @@ namespace Celeste.Mod.ARandomizerMod {
         public override void Load() {;
             typeof(ExtendedVariantImports).ModInterop();
             On.Celeste.Level.LoadLevel += LevelLoad;
-            On.Celeste.Level.Update += LevelUpdate;
             //On.Celeste.Player.Update += PlayerUpdate;
 
         }
 
         private void LevelLoad(On.Celeste.Level.orig_LoadLevel orig, Level self, Player.IntroTypes playerIntro, bool isFromLoader)
         {
+            orig(self, playerIntro, isFromLoader);
+
             if (ui == null)
             {
                 ui = new VaraintsUI
                 {
-                    Active = false
+                    Active = true
                 };
             }
-        }
 
-        private void LevelUpdate(On.Celeste.Level.orig_Update orig, Level self)
-        {
-            if (ARandomizerModModule.Settings.OpenVariantsMenu.Check)
-            {
-                ui.render = true;
-            }
-            else
-            {
-                ui.render = false;
-                orig(self);
-            }
-        }
-
-        private void PlayerUpdate(On.Celeste.Player.orig_Update orig, Player self)
-        {
-            if (ARandomizerModModule.Settings.OpenVariantsMenu.Check)
-                orig(self);
+            self.Add(ui);
         }
 
         public override void Unload()
