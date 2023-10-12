@@ -107,9 +107,9 @@ namespace Celeste.Mod.ARandomizerMod
 
         public void NavigateUI()
         {
-            if (ARandomizerModModule.Settings.NavigateDown.Pressed)
+            if (ARandomizerModModule.Settings.NavigateUp.Pressed)
             {
-                ARandomizerModModule.Settings.NavigateDown.ConsumePress();
+                ARandomizerModModule.Settings.NavigateUp.ConsumePress();
                 if (selectedNode == null)
                 {
                     selectedNode = activeVariants.First;
@@ -123,9 +123,9 @@ namespace Celeste.Mod.ARandomizerMod
                     selectedNode = activeVariants.Last;
                 }
             }
-            else if (ARandomizerModModule.Settings.NavigateUp.Pressed)
+            else if (ARandomizerModModule.Settings.NavigateDown.Pressed)
             {
-                ARandomizerModModule.Settings.NavigateUp.ConsumePress();
+                ARandomizerModModule.Settings.NavigateDown.ConsumePress();
                 if (selectedNode == null)
                 {
                     selectedNode = activeVariants.First;
@@ -172,10 +172,10 @@ namespace Celeste.Mod.ARandomizerMod
             if (variant is null)
             {
                 Logger.Log(LogLevel.Error, "ARandomizerMod", "UH OH!");
-                //return;
+                return;
             }
 
-            if (variant.name is not null)
+            if (variant.name != null)
             {
                 ResetVariantsWithName(variant.name);
             }
