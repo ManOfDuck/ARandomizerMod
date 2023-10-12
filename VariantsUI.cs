@@ -58,6 +58,72 @@ namespace Celeste.Mod.ARandomizerMod
 
             player.StateMachine.State = Player.StNormal;
         }
+
+        public void TriggerVariant(Variant variant)
+        {
+            Random random = new Random();
+
+            if (variant.name != null)
+            {
+                
+            }
+
+            if (variant.minInt.HasValue && variant.maxInt.HasValue && variant.defaultInt.HasValue)
+            {
+                int value = random.Next(variant.minInt.Value, variant.maxInt.Value);
+                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with int " + value);
+
+                ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, value, false);
+            }
+            else if (variant.minFloat.HasValue && variant.maxFloat.HasValue && variant.defaultFloat.HasValue)
+            {
+                float value = random.NextFloat(variant.maxFloat.Value - variant.minFloat.Value) + variant.minFloat.Value;
+                value = (float) Math.Round((decimal)value, 2);
+                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with float " + value);
+
+                ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, value, false);
+            }
+            else if (variant.value.HasValue)
+            {
+                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with bool " + variant.value.Value);
+                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, variant.value.Value, false);
+
+                if (variant.subVariant != null)
+                    TriggerVariant(variant.subVariant);
+            }
+            else if (variant.variant1 != null && variant.variant2 != null)
+            {
+                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with subvariants");
+
+                TriggerVariant(variant.variant1);
+                TriggerVariant(variant.variant2);
+            }
+        }
+
+        public void ResetVariant(Variant variant)
+        {
+            if (variant.minInt.HasValue && variant.maxInt.HasValue && variant.defaultInt.HasValue)
+            {
+                ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, variant.defaultInt.Value, false);
+            }
+            else if (variant.minFloat.HasValue && variant.maxFloat.HasValue && variant.defaultFloat.HasValue)
+            {
+                ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, variant.defaultFloat.Value, false);
+            }
+            if (variant.value.HasValue)
+            {
+                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, !variant.value.Value, false);
+                if (variant.subVariant != null)
+                {
+                    ResetVariant(variant.subVariant);
+                }
+            }
+            else if (variant.variant1 != null && variant.variant2 != null)
+            {
+                ResetVariant(variant.variant1);
+                ResetVariant(variant.variant2);
+            }
+        }
     }
 }
 

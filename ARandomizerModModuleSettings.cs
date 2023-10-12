@@ -7,6 +7,14 @@ namespace Celeste.Mod.ARandomizerMod {
         [DefaultButtonBinding(Buttons.LeftShoulder, Keys.Tab)]
         public ButtonBinding OpenVariantsMenu { get; set; }
 
+        [DefaultButtonBinding(Buttons.LeftThumbstickUp, Keys.Up)]
+        public ButtonConfigUI NavigateUp { get; set; }
+
+        [DefaultButtonBinding(Buttons.LeftThumbstickDown, Keys.Down)]
+        public ButtonConfigUI NavigateDown { get; set; }
+
+        public enum DifficultyOptions { EASY, NORMAL, HARD, IMPOSSIBLE };
+        public DifficultyOptions Difficulty { get; set; }
     }
 }
  
