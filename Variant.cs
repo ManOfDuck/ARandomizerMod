@@ -13,14 +13,16 @@ namespace Celeste.Mod.ARandomizerMod
         public float? maxFloat;
         public float? defaultFloat;
 
-        public bool? value;
+        public bool? boolValue;
 
-        public Variant subVariant;
-        public Variant variant1;
-        public Variant variant2;
+        public Variant subVariant = null;
+        public Variant variant1 = null;
+        public Variant variant2 = null;
 
         public enum Level { GREAT, GOOD, NICE, SILLY, DUBIOUS, TAME, NASTY, FUCKED_UP, SUB };
         public Level level;
+
+        public string value;
 
         public Variant(String name, int minInt, int maxInt, int defaultInt, Level level)
 		{
@@ -45,7 +47,7 @@ namespace Celeste.Mod.ARandomizerMod
         public Variant(String name, bool value, Level level)
         {
             this.name = name;
-            this.value = value;
+            this.boolValue = value;
 
             this.level = level;
         }
@@ -53,7 +55,7 @@ namespace Celeste.Mod.ARandomizerMod
         public Variant(String name, bool value, Variant subVariant, Level level)
         {
             this.name = name;
-            this.value = value;
+            this.boolValue = value;
             this.subVariant = subVariant;
 
             this.level = level;

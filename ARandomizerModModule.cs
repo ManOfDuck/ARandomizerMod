@@ -47,30 +47,36 @@ namespace Celeste.Mod.ARandomizerMod {
             typeof(ExtendedVariantImports).ModInterop();
             
             On.Celeste.Level.LoadLevel += LevelLoad;
+            On.Celeste.Level.Update += LevelUpdate;
             On.Celeste.Level.TransitionRoutine += RoomTransition;
         }
 
+        private void LevelUpdate(On.Celeste.Level.orig_Update orig, Level self)
+        {
+            ui ??= new VaraintsUI
+            {
+                Active = true
+            };
+            self.Add(ui);
+            ui.Update();
+            ui.Active = true;
+            orig(self);
+        }
 
         private void LevelLoad(On.Celeste.Level.orig_LoadLevel orig, Level self, Player.IntroTypes playerIntro, bool isFromLoader)
         {
             orig(self, playerIntro, isFromLoader);
 
-            if (ui == null)
-            {
-                ui = new VaraintsUI
+            ui ??= new VaraintsUI
                 {
                     Active = true
                 };
-            }
 
             self.Add(ui);
         }
 
         private IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
         {
-            //ExtendedVariantImports.TriggerBooleanVariant?.Invoke("DisableClimbJumping", true, false);
-            TestAllVariants();
-            /*
             DifficultyOptions difficulty = ARandomizerModModule.Settings.Difficulty;
 
             int[] rollsRange = variantRolls[difficulty];
@@ -80,16 +86,21 @@ namespace Celeste.Mod.ARandomizerMod {
 
             foreach (Variant v in variantsToActivate)
             {
+                Logger.Log(LogLevel.Info, "ARandomizerMod", "Passing: " + v.name);
+                if (v is null)
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Passing null hehe");
+
                 ui.TriggerVariant(v);
             }
+   
+            ui.Active = true;
             
-            */
             return orig(self, next, direction);
         }
 
         private void TestAllVariants()
         {
-            //TestVariantList(VariantLists.FUCKED_UP);
+            TestVariantList(VariantLists.FUCKED_UP);
             TestVariantList(VariantLists.nasty);
             TestVariantList(VariantLists.tame);
             TestVariantList(VariantLists.dubious);
@@ -103,6 +114,7 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             foreach (Variant v in list)
             {
+                Logger.Log(LogLevel.Warn, "ARandomizerMod", v.name);
                 ui.TriggerVariant(v);
             }
         }

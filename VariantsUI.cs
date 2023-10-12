@@ -3,12 +3,30 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using Celeste;
+using System.Collections.Generic;
 
 namespace Celeste.Mod.ARandomizerMod
 {
 	public class VaraintsUI : Entity
 	{
         public bool render = false;
+        public LinkedList<Variant> activeVariants = new LinkedList<Variant>();
+        public LinkedListNode<Variant> selectedNode;
+        
+        public int topHeight = 250;
+        public int width = 700;
+        public int minLines = 4;
+        public int verticalPadding = 10;
+        public int offset = 0;
+        public Color color = new(0, 0, 0, 230);
+
+        public int lineHeight = 45;
+        public int textOffset = 15;
+        public float textScale = 0.7f;
+        public Color textColor = Color.White;
+
+        public int subVariantOffset = 40;
+        public Color selectionColor = Color.LightGreen;
 
         public VaraintsUI()
         {
@@ -22,27 +40,115 @@ namespace Celeste.Mod.ARandomizerMod
             if (!render)
                 return;
 
-            Draw.Rect(new Vector2(10, 250), 500, 250, new(0, 0, 0, 200));
-            ActiveFont.Draw("Test UI Box", new Vector2(10, 325), Color.White);
+            RenderBackground();
+
+            if (activeVariants.Count < 1)
+            {
+                RenderText("No Active Variants", textColor, 0, 0);
+            }
+            else
+            {
+                RenderActiveVariants();
+            }
+        }
+
+        private void RenderBackground()
+        {
+            int height = Math.Max(minLines * lineHeight, (lineHeight * activeVariants.Count) + (verticalPadding * 2));
+            Draw.Rect(new Vector2(offset, topHeight), width, height, color);
+        }
+
+        private void RenderActiveVariants()
+        {
+            LinkedListNode<Variant> node = activeVariants.First;
+            for (int line = 0; line < activeVariants.Count; line++)
+            {
+                if (node == null) break; // for safety, should never happen
+                RenderVariant(node.Value, line);     
+                node = node.Next;
+            }
+        }
+
+        private void RenderVariant(Variant variant, float line)
+        {
+            Color color = (selectedNode is not null && selectedNode.Value.name == variant.name) ? selectionColor : textColor;
+            int offset = (variant.level == Variant.Level.SUB) ? subVariantOffset : 0;
+            string text = variant.name + ": " + ExtendedVariantImports.GetCurrentVariantValue?.Invoke(variant.name);
+            
+            RenderText(text, color, line, offset);
+        }
+
+        private void RenderText(String text, Color color, float line, float lineOffset)
+        {
+            float xPos = offset + textOffset + lineOffset;
+            float yPos = topHeight + verticalPadding + (lineHeight * line);
+            ActiveFont.Draw(text, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(textScale, textScale), color);
         }
 
         public override void Update()
         {
             base.Update();
 
-            if (ARandomizerModModule.Settings.OpenVariantsMenu.Pressed)
+            if (ARandomizerModModule.Settings.OpenVariantsMenu.Check)
             {
                 EnableUI();
             }
             if (ARandomizerModModule.Settings.OpenVariantsMenu.Released)
             {
                 DisableUI();
+                selectedNode = null;
+            }
+
+            if (render && activeVariants.Count > 0)
+            {
+                NavigateUI();
+            }   
+        }
+
+        public void NavigateUI()
+        {
+            if (ARandomizerModModule.Settings.NavigateDown.Pressed)
+            {
+                ARandomizerModModule.Settings.NavigateDown.ConsumePress();
+                if (selectedNode == null)
+                {
+                    selectedNode = activeVariants.First;
+                }
+                else if (selectedNode.Previous != null)
+                {
+                    selectedNode = selectedNode.Previous;
+                }
+                else
+                {
+                    selectedNode = activeVariants.Last;
+                }
+            }
+            else if (ARandomizerModModule.Settings.NavigateUp.Pressed)
+            {
+                ARandomizerModModule.Settings.NavigateUp.ConsumePress();
+                if (selectedNode == null)
+                {
+                    selectedNode = activeVariants.First;
+                }
+                else if (selectedNode.Next != null)
+                {
+                    selectedNode = selectedNode.Next;
+                }
+                else
+                {
+                    selectedNode = activeVariants.First;
+                }
+            }
+
+            if (ARandomizerModModule.Settings.Select.Pressed && selectedNode != null && selectedNode.Value != null)
+            {
+                ResetVariant(selectedNode.Value);
             }
         }
 
         public void EnableUI()
         {
-            Player player = Scene.Tracker.GetEntity<Player>();
+            Player player = Scene?.Tracker?.GetEntity<Player>();
             if (player is null) return;
 
             render = true;
@@ -63,9 +169,15 @@ namespace Celeste.Mod.ARandomizerMod
         {
             Random random = new Random();
 
-            if (variant.name != null)
+            if (variant is null)
             {
-                
+                Logger.Log(LogLevel.Error, "ARandomizerMod", "UH OH!");
+                //return;
+            }
+
+            if (variant.name is not null)
+            {
+                ResetVariantsWithName(variant.name);
             }
 
             if (variant.minInt.HasValue && variant.maxInt.HasValue && variant.defaultInt.HasValue)
@@ -74,6 +186,8 @@ namespace Celeste.Mod.ARandomizerMod
                 Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with int " + value);
 
                 ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, value, false);
+                variant.value = value.ToString();
+                activeVariants.AddLast(variant);
             }
             else if (variant.minFloat.HasValue && variant.maxFloat.HasValue && variant.defaultFloat.HasValue)
             {
@@ -82,43 +196,78 @@ namespace Celeste.Mod.ARandomizerMod
                 Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with float " + value);
 
                 ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, value, false);
+                variant.value = value.ToString();
+                activeVariants.AddLast(variant);
             }
-            else if (variant.value.HasValue)
+            else if (variant.boolValue.HasValue)
             {
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with bool " + variant.value.Value);
-                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, variant.value.Value, false);
+                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with bool " + variant.boolValue.Value);
+                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, variant.boolValue.Value, false);
+
+                variant.value = variant.boolValue.Value.ToString();
+                activeVariants.AddLast(variant);
 
                 if (variant.subVariant != null)
+                {
+                    Logger.Log(LogLevel.Warn, "ARandomizerMod", variant.name + " has subVariant, triggering subVariant:");
                     TriggerVariant(variant.subVariant);
+                }
             }
             else if (variant.variant1 != null && variant.variant2 != null)
             {
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with subvariants");
+                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering variant with subvariants:");
 
                 TriggerVariant(variant.variant1);
                 TriggerVariant(variant.variant2);
             }
         }
 
+        public void ResetVariantsWithName(String name)
+        {
+
+            LinkedListNode<Variant> node = activeVariants.First;
+            for (int i = 0; i < activeVariants.Count; i++)
+            {
+                if (node.Value != null && node.Value.name == name)
+                {
+                    ResetVariant(node.Value);
+                }
+                node = node.Next;
+            }
+        }
+
+        public void ResetRandomVariant()
+        {
+
+        }
+
         public void ResetVariant(Variant variant)
         {
-            if (variant.minInt.HasValue && variant.maxInt.HasValue && variant.defaultInt.HasValue)
+            if (variant.name is not null)
+            {
+                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Resetting " + variant.name);
+            }
+            if (variant.defaultInt.HasValue)
             {
                 ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, variant.defaultInt.Value, false);
+                activeVariants.Remove(variant);
             }
-            else if (variant.minFloat.HasValue && variant.maxFloat.HasValue && variant.defaultFloat.HasValue)
+            else if (variant.defaultFloat.HasValue)
             {
                 ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, variant.defaultFloat.Value, false);
+                activeVariants.Remove(variant);
             }
-            if (variant.value.HasValue)
+            else if (variant.boolValue.HasValue)
             {
-                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, !variant.value.Value, false);
+                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, !variant.boolValue.Value, false);
+                activeVariants.Remove(variant);
+
                 if (variant.subVariant != null)
                 {
                     ResetVariant(variant.subVariant);
                 }
             }
-            else if (variant.variant1 != null && variant.variant2 != null)
+            if (variant.variant1 != null && variant.variant2 != null)
             {
                 ResetVariant(variant.variant1);
                 ResetVariant(variant.variant2);

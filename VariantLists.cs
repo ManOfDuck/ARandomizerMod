@@ -31,7 +31,7 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("JumpCount", 2, 5, -1, Variant.Level.GOOD),
 			new Variant("CoyoteTime", 100f, 100f, 1.0f, Variant.Level.GOOD),
 
-			new Variant("DashLength", 2, 3, -1, Variant.Level.GOOD),
+			new Variant("DashLength", 2.0f, 3.0f, -1.0f, Variant.Level.GOOD),
 
 			new Variant("EverythingIsUnderwater", true, Variant.Level.GOOD),
 
@@ -73,7 +73,7 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("GameSpeed", 0.1f, 0.9f, 1.0f, Variant.Level.DUBIOUS),
 			new Variant("GameSpeed", 1.1f, 5.0f, 1.0f, Variant.Level.DUBIOUS),
 
-			new Variant("RegularHiccups", 0.3f, 0.6f, 1.0f, Variant.Level.DUBIOUS),
+			new Variant("RegularHiccups", 0.3f, 0.6f, 0.0f, Variant.Level.DUBIOUS),
 			new Variant("HiccupStrength", 3.0f, 5.0f, 1.0f, Variant.Level.DUBIOUS),
 
 			//new Variant("CorrectedMirrorMode", true, Variant.Level.DUBIOUS),
