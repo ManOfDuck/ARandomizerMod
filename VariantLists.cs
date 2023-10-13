@@ -32,10 +32,11 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("CoyoteTime", 100f, 100f, 1.0f, Variant.Level.GOOD),
 
 			new Variant("DashLength", 2.0f, 3.0f, -1.0f, Variant.Level.GOOD),
-
+			 
 			new Variant("EverythingIsUnderwater", true, Variant.Level.GOOD),
 
 			new Variant("Stamina", 230, 500, 110, Variant.Level.GOOD),
+			new Variant("JellyfishEverywhere", 1, 1, 0, Variant.Level.GOOD),
         };
 
 		public static Variant[] nice = {
@@ -48,10 +49,8 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("CoyoteTime", 2.0f, 5.0f, 1.0f, Variant.Level.NICE),
 			new Variant("SpeedX", 1.1f, 2.0f, 1.0f, Variant.Level.NICE),
 
-			new Variant("WindEverywhere", 6, 6, 0, Variant.Level.NICE),
+			//new Variant("WindEverywhere", 6, 6, 0, Variant.Level.NICE),
 			new Variant("WindEverywhere", 13, 13, 0, Variant.Level.NICE),
-
-			new Variant("JellyfishEverywhere", 1, 3, 0, Variant.Level.NICE),
 
 			new Variant("Stamina", 120, 220, 110, Variant.Level.NICE),
         };
@@ -100,17 +99,17 @@ namespace Celeste.Mod.ARandomizerMod
 
             new Variant("AddSeekers", 1, 1, 0, Variant.Level.TAME),
 			new Variant("WindEverywhere", 2, 3, 0, Variant.Level.TAME),
-            new Variant("WindEverywhere", 7, 9, 0, Variant.Level.TAME),
-            new Variant("WindEverywhere", 12, 12, 0, Variant.Level.TAME),
+            //new Variant("WindEverywhere", 7, 9, 0, Variant.Level.TAME),
+            //new Variant("WindEverywhere", 12, 12, 0, Variant.Level.TAME),
 
 			new Variant("Stamina", 50, 100, 110, Variant.Level.TAME),
 
 			new Variant("RegularHiccups", 1.0f, 5.0f, 0.0f, Variant.Level.TAME),
-			new Variant("RoomLighting", 0.0f, 0.0f, 1.0f, Variant.Level.TAME),
+			new Variant("RoomLighting", 0.0f, 0.0f, 1.0f, Variant.Level.TAME), 
 
-			new Variant("GlitchEffect", 0.05f, 0.49f, 0.0f, Variant.Level.TAME),
+			new Variant("GlitchEffect", 0.05f, 0.1f, 0.0f, Variant.Level.TAME),
 
-			new Variant("BlurLevel", 1.0f, 10.0f, 0.0f, Variant.Level.TAME),
+			new Variant("BlurLevel", 0.1f, 0.7f, 0.0f, Variant.Level.TAME),
 
 			new Variant("ZoomLevel", 0.1f, 1.9f, 1.0f, Variant.Level.TAME),
         };
@@ -144,9 +143,9 @@ namespace Celeste.Mod.ARandomizerMod
                 new Variant("OshiroCount", 1, 1, 0, Variant.Level.SUB),
                 new Variant("ReverseOshiroCount", 1, 1, 0, Variant.Level.SUB)), Variant.Level.NASTY),
 
-            new Variant("WindEverywhere", 4, 5, 0, Variant.Level.NASTY),
+            //new Variant("WindEverywhere", 4, 5, 0, Variant.Level.NASTY),
 			new Variant("WindEverywhere", 10, 11, 0, Variant.Level.NASTY),
-            new Variant("WindEverywhere", 14, 14, 0, Variant.Level.NASTY),
+            //new Variant("WindEverywhere", 14, 14, 0, Variant.Level.NASTY),
 			new Variant("SnowballsEverywhere", true,
 				new Variant("SnowballDelay", 0.0f, 2.0f, 0.8f, Variant.Level.SUB), Variant.Level.NASTY),
 
@@ -164,9 +163,9 @@ namespace Celeste.Mod.ARandomizerMod
 
 			new Variant("UpsideDown", true, Variant.Level.NASTY),
 
-			new Variant("GlitchEffect", 0.5f, 1.0f, 0.0f, Variant.Level.NASTY),
+			new Variant("GlitchEffect", 0.1f, 0.5f, 0.0f, Variant.Level.NASTY),
 			new Variant("ZoomLevel", 2.0f, 2.9f, 1.0f, Variant.Level.NASTY),
-
+            new Variant("BounceEverywhere", true, Variant.Level.FUCKED_UP),
         };
 
 		public static Variant[] FUCKED_UP = {
@@ -185,7 +184,7 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("TheoCrystalsEverywhere", true, Variant.Level.FUCKED_UP),
 			new Variant("InvertDashes", true, Variant.Level.FUCKED_UP),
 			new Variant("InvertVerticalControls", true, Variant.Level.FUCKED_UP),
-			new Variant("BounceEverywhere", true, Variant.Level.FUCKED_UP),
+			
 			new Variant("ZoomLevel", 3.0f, 5.0f, 1.0f, Variant.Level.FUCKED_UP),
 		};
 
@@ -195,8 +194,8 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("DashTrailAllTheTime", true, Variant.Level.SILLY),
 			new Variant("DisplayDashCount", true, Variant.Level.SILLY),
 			new Variant("DisplaySpeedometer", 2, 2, 0, Variant.Level.SILLY),
-			new Variant("BackgroundBrightness", 0.0f, 9.0f, 1.0f, Variant.Level.SILLY),
-			new Variant("RoomBloom", 0.0f, 50.0f, 0.0f, Variant.Level.SILLY),
+			new Variant("BackgroundBrightness", 0.0f, 5.0f, 1.0f, Variant.Level.SILLY),
+			new Variant("RoomBloom", 0.0f, 5.0f, 0.0f, Variant.Level.SILLY),
 
 			new Variant("AnxietyEffect", 0.1f, 10.0f, 0.0f,  Variant.Level.SILLY),
 			new Variant("BackgroundBlurLevel", 0.1f, 10.0f, 0.0f, Variant.Level.SILLY),

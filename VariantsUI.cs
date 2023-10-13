@@ -50,7 +50,7 @@ namespace Celeste.Mod.ARandomizerMod
         readonly float smallMoneyScale = 0.85f;
         readonly Color smallMoneyColor = Color.Ivory;
          
-        readonly int scoreOffset = 730 - 150;
+        readonly int scoreOffset = 730 - 250;
         readonly int scorePadding = 10;
         readonly float scoreScale = 0.64f;
         readonly Color scoreColor = Color.White;
@@ -300,24 +300,24 @@ namespace Celeste.Mod.ARandomizerMod
             }
         }
 
-        //StDummy breaks things like Badeline and chasers
+        //StDummy breaks things like Badeline and chasers, oh well
         public void EnableUI()
         {
-            //Player player = Scene?.Tracker?.GetEntity<Player>();
-            //if (player is null) return;
+            Player player = Scene?.Tracker?.GetEntity<Player>();
+            if (player is null) return;
 
             render = true;
-            //player.StateMachine.State = Player.StDummy;
+            player.StateMachine.State = Player.StDummy;
         }
 
         public void DisableUI()
         {
             render = false;
 
-           // Player player = Scene.Tracker.GetEntity<Player>();
-            //if (player is null) return;
+            Player player = Scene.Tracker.GetEntity<Player>();
+            if (player is null) return;
 
-            //player.StateMachine.State = Player.StNormal;
+            player.StateMachine.State = Player.StNormal;
         }
 
         public void TriggerVariant(Variant variant)
@@ -326,7 +326,7 @@ namespace Celeste.Mod.ARandomizerMod
 
             if (variant == null)
             {
-                Logger.Log(LogLevel.Error, "ARandomizerMod", "UH OH!");
+                //Logger.Log(LogLevel.Error, "ARandomizerMod", "UH OH!");
                 return;
             }
 
@@ -335,14 +335,14 @@ namespace Celeste.Mod.ARandomizerMod
                 ResetVariantsWithName(variant.name);
             }else if (variant.variant1 != null && variant.variant2 != null)
             {
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering variant with subvariants:");
+                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering variant with subvariants:");
 
                 TriggerVariant(variant.variant1);
                 TriggerVariant(variant.variant2);
             }
             else if (variant.variant1 != null && variant.variant2 != null)
             {
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering variant with subvariants:");
+                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering variant with subvariants:");
 
                 TriggerVariant(variant.variant1);
                 TriggerVariant(variant.variant2);
@@ -352,7 +352,7 @@ namespace Celeste.Mod.ARandomizerMod
             if (variant.minInt.HasValue && variant.maxInt.HasValue && variant.defaultInt.HasValue)
             {
                 int value = random.Next(variant.minInt.Value, variant.maxInt.Value);
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with int " + value);
+                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with int " + value);
 
                 ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, value, false);
                 variant.value = value.ToString();
@@ -362,7 +362,7 @@ namespace Celeste.Mod.ARandomizerMod
             {
                 float value = random.NextFloat(variant.maxFloat.Value - variant.minFloat.Value) + variant.minFloat.Value;
                 value = (float) Math.Round((decimal)value, 2);
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with float " + value);
+                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with float " + value);
 
                 ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, value, false);
                 variant.value = value.ToString();
@@ -370,7 +370,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
             else if (variant.boolValue.HasValue)
             {
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with bool " + variant.boolValue.Value);
+                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with bool " + variant.boolValue.Value);
                 ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, variant.boolValue.Value, false);
 
                 variant.value = variant.boolValue.Value.ToString();
@@ -419,7 +419,7 @@ namespace Celeste.Mod.ARandomizerMod
         {
             if (variant.name is not null)
             {
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", "Resetting " + variant.name);
+                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Resetting " + variant.name);
             }
             if (variant.defaultInt.HasValue)
             {

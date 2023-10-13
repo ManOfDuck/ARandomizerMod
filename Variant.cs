@@ -3,9 +3,9 @@ namespace Celeste.Mod.ARandomizerMod
 {
     public class Variant
     {
-        readonly int greatPrice = -200;
-        readonly int goodPrice = -100;
-        readonly int nicePrice = -50;
+        readonly int greatPrice = -100;
+        readonly int goodPrice = -50;
+        readonly int nicePrice = -10;
         readonly int sillyPrice = 10;
         readonly int dubiousPrice = 100;
         readonly int tamePrice = 200;
