@@ -25,7 +25,7 @@ namespace Celeste.Mod.ARandomizerMod {
         int[] easyRolls = { 1, 2 };
 
         Dictionary<DifficultyOptions, float[]> variantRanges = new Dictionary<DifficultyOptions, float[]>();
-        float[] easyRanges = { 0.05f, 0.1f, 0.25f, 0.45f, 0.5f, 0.65f, 0.75f, 0.8f };
+        float[] easyRanges = { 0.05f, 0.15f, 0.35f, 0.55f, 0.75f, 0.85f, 0.75f, 0.8f, 1f };
 
         public ARandomizerModModule()
         {
@@ -77,6 +77,8 @@ namespace Celeste.Mod.ARandomizerMod {
 
         private IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
         {
+            ui.RoomCleared();
+
             DifficultyOptions difficulty = ARandomizerModModule.Settings.Difficulty;
 
             int[] rollsRange = variantRolls[difficulty];
@@ -94,7 +96,7 @@ namespace Celeste.Mod.ARandomizerMod {
             }
    
             ui.Active = true;
-            
+
             return orig(self, next, direction);
         }
 
@@ -160,6 +162,10 @@ namespace Celeste.Mod.ARandomizerMod {
                 else if (roll < ranges[7])
                 {
                     variants.Add(GetRandomVariant(VariantLists.great));
+                }
+                else if (roll < ranges[8])
+                {
+                    ui.ResetRandomVariant();
                 }
             }
 

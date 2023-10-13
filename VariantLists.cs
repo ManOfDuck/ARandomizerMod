@@ -73,8 +73,7 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("GameSpeed", 0.1f, 0.9f, 1.0f, Variant.Level.DUBIOUS),
 			new Variant("GameSpeed", 1.1f, 5.0f, 1.0f, Variant.Level.DUBIOUS),
 
-			new Variant("RegularHiccups", 0.3f, 0.6f, 0.0f, Variant.Level.DUBIOUS),
-			new Variant("HiccupStrength", 3.0f, 5.0f, 1.0f, Variant.Level.DUBIOUS),
+			//new Variant("HiccupStrength", 3.0f, 5.0f, 1.0f, Variant.Level.DUBIOUS),
 
 			//new Variant("CorrectedMirrorMode", true, Variant.Level.DUBIOUS),
 
@@ -150,6 +149,8 @@ namespace Celeste.Mod.ARandomizerMod
             new Variant("WindEverywhere", 14, 14, 0, Variant.Level.NASTY),
 			new Variant("SnowballsEverywhere", true,
 				new Variant("SnowballDelay", 0.0f, 2.0f, 0.8f, Variant.Level.SUB), Variant.Level.NASTY),
+
+            new Variant("RegularHiccups", 0.3f, 0.6f, 0.0f, Variant.Level.DUBIOUS),
 
             new Variant("AddSeekers", 2, 2, 0, Variant.Level.NASTY),
 
