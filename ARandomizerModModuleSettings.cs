@@ -16,7 +16,7 @@ namespace Celeste.Mod.ARandomizerMod {
         [DefaultButtonBinding(Buttons.A, Keys.C)]
         public ButtonBinding Select { get; set; }
 
-        public enum DifficultyOptions { EASY, NORMAL, HARD, IMPOSSIBLE };
+        public enum DifficultyOptions { EASY };
         public DifficultyOptions Difficulty { get; set; }
     }
 }

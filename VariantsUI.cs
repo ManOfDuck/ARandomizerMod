@@ -15,8 +15,8 @@ namespace Celeste.Mod.ARandomizerMod
         public LinkedListNode<Variant> selectedNode;
 
         public int money = 0;
-        readonly int moneyGainedPerRoom = 50;
-        readonly int strawberryMoney = 100;
+        readonly int moneyGainedPerRoom = 100;
+        readonly int strawberryMoney = 300;
         readonly int heartMoney = 1000;
         readonly float variantCostToGainRatio = 0.01f;
 

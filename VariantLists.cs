@@ -163,7 +163,7 @@ namespace Celeste.Mod.ARandomizerMod
 
 			new Variant("UpsideDown", true, Variant.Level.NASTY),
 
-			new Variant("GlitchEffect", 0.1f, 0.5f, 0.0f, Variant.Level.NASTY),
+			//new Variant("GlitchEffect", 0.1f, 0.5f, 0.0f, Variant.Level.NASTY),
 			new Variant("ZoomLevel", 2.0f, 2.9f, 1.0f, Variant.Level.NASTY),
             new Variant("BounceEverywhere", true, Variant.Level.FUCKED_UP),
         };
@@ -180,7 +180,7 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("DashLength", 0.0f, 0.1f, 1.0f, Variant.Level.FUCKED_UP),
 			new Variant("DashCount", 0, 0, -1, Variant.Level.FUCKED_UP),
 
-			new Variant("AddSeekers", 3, 3, 0, Variant.Level.FUCKED_UP),
+			new Variant("AddSeekers", 2, 2, 0, Variant.Level.FUCKED_UP),
 			new Variant("TheoCrystalsEverywhere", true, Variant.Level.FUCKED_UP),
 			new Variant("InvertDashes", true, Variant.Level.FUCKED_UP),
 			new Variant("InvertVerticalControls", true, Variant.Level.FUCKED_UP),
@@ -194,11 +194,11 @@ namespace Celeste.Mod.ARandomizerMod
 			new Variant("DashTrailAllTheTime", true, Variant.Level.SILLY),
 			new Variant("DisplayDashCount", true, Variant.Level.SILLY),
 			new Variant("DisplaySpeedometer", 2, 2, 0, Variant.Level.SILLY),
-			new Variant("BackgroundBrightness", 0.0f, 5.0f, 1.0f, Variant.Level.SILLY),
-			new Variant("RoomBloom", 0.0f, 5.0f, 0.0f, Variant.Level.SILLY),
+			new Variant("BackgroundBrightness", -1.0f, 5.0f, 1.0f, Variant.Level.SILLY),
+			new Variant("RoomBloom", -1.0f, 5.0f, 0.0f, Variant.Level.SILLY),
 
-			new Variant("AnxietyEffect", 0.1f, 10.0f, 0.0f,  Variant.Level.SILLY),
-			new Variant("BackgroundBlurLevel", 0.1f, 10.0f, 0.0f, Variant.Level.SILLY),
+			new Variant("AnxietyEffect", -1.0f, 10.0f, 0.0f,  Variant.Level.SILLY),
+			new Variant("BackgroundBlurLevel", -1.0f, 10.0f, 0.0f, Variant.Level.SILLY),
 
 			//TODO: Color Grading would be awesome
 
