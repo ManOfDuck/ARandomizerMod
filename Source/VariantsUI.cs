@@ -322,66 +322,33 @@ namespace Celeste.Mod.ARandomizerMod
 
         public void TriggerVariant(Variant variant)
         {
-            Random random = new Random();
+            Random random = new();
 
-            if (variant == null)
+            switch (variant)
             {
-                //Logger.Log(LogLevel.Error, "ARandomizerMod", "UH OH!");
-                return;
+                case IntegerVariant integerVariant:
+                    int intValue = random.Next(integerVariant.minInt, integerVariant.maxInt);
+                    ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, intValue, false);
+                    variant.value = intValue.ToString();
+                    break;
+                case FloatVariant floatVariant:
+                    float floatValue = random.NextFloat(floatVariant.maxFloat - floatVariant.minFloat) + floatVariant.minFloat;
+                    ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, floatValue, false);
+                    variant.value = floatValue.ToString();
+                    break;
+                case BooleanVariant booleanVariant:
+                    bool boolValue = booleanVariant.status;
+                    ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, boolValue, false);
+                    variant.value = boolValue.ToString();
+                    foreach (Variant subVariant in booleanVariant.subVariants)
+                        TriggerVariant(subVariant);
+                    break;
+                case null:
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "JESSE: Null variant triggered");
+                    return;
             }
 
-            if (variant.name != null)
-            {
-                ResetVariantsWithName(variant.name);
-            }else if (variant.variant1 != null && variant.variant2 != null)
-            {
-                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering variant with subvariants:");
-
-                TriggerVariant(variant.variant1);
-                TriggerVariant(variant.variant2);
-            }
-            else if (variant.variant1 != null && variant.variant2 != null)
-            {
-                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering variant with subvariants:");
-
-                TriggerVariant(variant.variant1);
-                TriggerVariant(variant.variant2);
-                return;
-            }
-
-            if (variant.minInt.HasValue && variant.maxInt.HasValue && variant.defaultInt.HasValue)
-            {
-                int value = random.Next(variant.minInt.Value, variant.maxInt.Value);
-                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with int " + value);
-
-                ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, value, false);
-                variant.value = value.ToString();
-                activeVariants.AddLast(variant);
-            }
-            else if (variant.minFloat.HasValue && variant.maxFloat.HasValue && variant.defaultFloat.HasValue)
-            {
-                float value = random.NextFloat(variant.maxFloat.Value - variant.minFloat.Value) + variant.minFloat.Value;
-                value = (float) Math.Round((decimal)value, 2);
-                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with float " + value);
-
-                ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, value, false);
-                variant.value = value.ToString();
-                activeVariants.AddLast(variant);
-            }
-            else if (variant.boolValue.HasValue)
-            {
-                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Triggering " + variant.name + " with bool " + variant.boolValue.Value);
-                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, variant.boolValue.Value, false);
-
-                variant.value = variant.boolValue.Value.ToString();
-                activeVariants.AddLast(variant);
-
-                if (variant.subVariant != null)
-                {
-                    Logger.Log(LogLevel.Warn, "ARandomizerMod", variant.name + " has subVariant, triggering subVariant:");
-                    TriggerVariant(variant.subVariant);
-                }
-            }
+            activeVariants.AddLast(variant);
         }
 
         public void ResetVariantsWithName(String name)
@@ -417,35 +384,25 @@ namespace Celeste.Mod.ARandomizerMod
 
         public void ResetVariant(Variant variant)
         {
-            if (variant.name is not null)
+            switch (variant)
             {
-                //Logger.Log(LogLevel.Warn, "ARandomizerMod", "Resetting " + variant.name);
+                case IntegerVariant integerVariant:
+                    ExtendedVariantImports.TriggerIntegerVariant?.Invoke(integerVariant.name, integerVariant.defaultInt, false);
+                    break;
+                case FloatVariant floatVariant:
+                    ExtendedVariantImports.TriggerFloatVariant?.Invoke(floatVariant.name, floatVariant.defaultFloat, false);
+                    break;
+                case BooleanVariant booleanVariant:
+                    ExtendedVariantImports.TriggerBooleanVariant?.Invoke(booleanVariant.name, !booleanVariant.status, false);
+                    foreach (Variant subVariant in booleanVariant.subVariants)
+                        ResetVariant(subVariant);
+                    break;
+                case null:
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "JESSE: Null variant triggered");
+                    return;
             }
-            if (variant.defaultInt.HasValue)
-            {
-                ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, variant.defaultInt.Value, false);
-                activeVariants.Remove(variant);
-            }
-            else if (variant.defaultFloat.HasValue)
-            {
-                ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, variant.defaultFloat.Value, false);
-                activeVariants.Remove(variant);
-            }
-            else if (variant.boolValue.HasValue)
-            {
-                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, !variant.boolValue.Value, false);
-                activeVariants.Remove(variant);
 
-                if (variant.subVariant != null)
-                {
-                    ResetVariant(variant.subVariant);
-                }
-            }
-            if (variant.variant1 != null && variant.variant2 != null)
-            {
-                ResetVariant(variant.variant1);
-                ResetVariant(variant.variant2);
-            }
+            activeVariants.Remove(variant);
         }
     }
 }
