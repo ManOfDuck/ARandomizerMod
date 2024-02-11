@@ -322,7 +322,13 @@ namespace Celeste.Mod.ARandomizerMod
 
         public void TriggerVariant(Variant variant)
         {
+            Logger.Log(LogLevel.Info, "ARandomizerMod", "Activating variant " + variant.name);
             Random random = new();
+
+            if (variant is null)
+            {
+                Logger.Log("ARandomizerMod", "hi");
+            }
 
             switch (variant)
             {
@@ -348,19 +354,17 @@ namespace Celeste.Mod.ARandomizerMod
                     return;
             }
 
-            activeVariants.AddLast(variant);
-        }
-
-        public void ResetVariantsWithName(String name)
-        {
-            foreach (Variant variant in activeVariants)
+            foreach (Variant activeVariant in activeVariants)
             {
-                if (variant.name is not null && variant.name == name)
+                if (activeVariant.name.Equals(variant.name))
                 {
-                    ResetVariant(variant);
-                    return;
+                    activeVariants.Remove(activeVariant);
+                    break;
                 }
             }
+
+            Logger.Log(LogLevel.Info, "ARandomizerMod", "Activated variant " + variant.name + " with value " + variant.value);
+            activeVariants.AddLast(variant);
         }
 
         public void ResetRandomVariant()
@@ -388,12 +392,15 @@ namespace Celeste.Mod.ARandomizerMod
             {
                 case IntegerVariant integerVariant:
                     ExtendedVariantImports.TriggerIntegerVariant?.Invoke(integerVariant.name, integerVariant.defaultInt, false);
+                    variant.value = integerVariant.value;
                     break;
                 case FloatVariant floatVariant:
                     ExtendedVariantImports.TriggerFloatVariant?.Invoke(floatVariant.name, floatVariant.defaultFloat, false);
+                    variant.value = floatVariant.value;
                     break;
                 case BooleanVariant booleanVariant:
                     ExtendedVariantImports.TriggerBooleanVariant?.Invoke(booleanVariant.name, !booleanVariant.status, false);
+                    variant.value = booleanVariant.value;
                     foreach (Variant subVariant in booleanVariant.subVariants)
                         ResetVariant(subVariant);
                     break;
@@ -402,6 +409,7 @@ namespace Celeste.Mod.ARandomizerMod
                     return;
             }
 
+            Logger.Log(LogLevel.Info, "ARandomizerMod", "Resetting variant " + variant.name + " to value " + variant.value);
             activeVariants.Remove(variant);
         }
     }
