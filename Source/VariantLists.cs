@@ -31,7 +31,7 @@ namespace Celeste.Mod.ARandomizerMod
 			new IntegerVariant("JumpCount", 2, 5, -1, Variant.Level.GOOD),
 			new FloatVariant("CoyoteTime", 100f, 100f, 1.0f, Variant.Level.GOOD),
 
-			new FloatVariant("DashLength", 2.0f, 3.0f, -1.0f, Variant.Level.GOOD),
+			new FloatVariant("DashLength", 2.0f, 3.0f, 1.0f, Variant.Level.GOOD),
 			 
 			new BooleanVariant("EverythingIsUnderwater", true, Variant.Level.GOOD),
 
