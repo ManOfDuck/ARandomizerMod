@@ -119,10 +119,10 @@ namespace Celeste.Mod.ARandomizerMod {
 
         private List<Variant> GetRandomVariants(int[] rollsRange, float[] ranges)
         {
-            Random random = new Random();
+            Random random = new();
             int rolls = random.Next(rollsRange[0], rollsRange[1]);
 
-            List<Variant> variants = new List<Variant>();
+            List<Variant> variants = new();
             for (int i = 0; i < rolls; i++)
             {
                 float roll = random.NextFloat(1);
