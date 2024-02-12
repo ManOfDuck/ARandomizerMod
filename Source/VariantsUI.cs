@@ -11,20 +11,10 @@ namespace Celeste.Mod.ARandomizerMod
 	public class VaraintsUI : Entity
 	{
         public bool render = false;
-        public LinkedList<Variant> activeVariants = new LinkedList<Variant>();
         public LinkedListNode<Variant> selectedNode;
 
-        public int money = 0;
-        readonly int moneyGainedPerRoom = 100;
-        readonly int strawberryMoney = 300;
-        readonly int heartMoney = 1000;
-        readonly float variantCostToGainRatio = 0.01f;
-
-        public int score = 0;
-        readonly int scoreGainedPerRoom = 100;
-        readonly int strawberryScore = 1000;
-        readonly int heartScore = 10000;
-        readonly float variantCostToScoreRatio = 0.5f;
+        readonly VariantManager variantManager;
+        readonly EconomyManager economyManager;
 
         readonly int topHeight = 250;
         readonly int width = 730;
@@ -68,41 +58,15 @@ namespace Celeste.Mod.ARandomizerMod
         readonly Color selectionColor = Color.LightGreen;
         readonly Color cantAffordSelectionColor = Color.LightGray;
 
-        public VaraintsUI()
+        public VaraintsUI(VariantManager variantManager, EconomyManager economyManager)
         {
+            this.variantManager = variantManager;
+            this.economyManager = economyManager;
+
             AddTag(Tags.HUD);
-
-            On.Celeste.StrawberryPoints.Added += StrawberryCollected;
-            On.Celeste.HeartGem.Collect += HeartCollected;
         }
 
-        private void HeartCollected(On.Celeste.HeartGem.orig_Collect orig, HeartGem self, Player player)
-        {
-            money += heartMoney;
-            score += heartScore;
-
-            orig(self, player);
-        }
-
-        private void StrawberryCollected(On.Celeste.StrawberryPoints.orig_Added orig, StrawberryPoints self, Scene scene)
-        {
-            money += strawberryMoney;
-            score += strawberryScore;
-
-            orig(self, scene);
-        }
-
-        public void RoomCleared()
-        {
-            money += moneyGainedPerRoom;
-            score += scoreGainedPerRoom;
-            foreach (Variant variant in activeVariants)
-            {
-                money += (int) (variant.cost * variantCostToGainRatio);
-                score += (int)(variant.cost * variantCostToScoreRatio);
-            }
-        }
-
+        #region Rendering
         public override void Render()
         {
             base.Render();
@@ -122,7 +86,7 @@ namespace Celeste.Mod.ARandomizerMod
                 RenderMoneySmall();
             }
 
-            if (activeVariants.Count < 1)
+            if (variantManager.activeVariants.Count < 1)
             {
                 RenderText("No Active Variants", textColor, 0, 0);
             }
@@ -135,7 +99,7 @@ namespace Celeste.Mod.ARandomizerMod
         private void RenderBackground()
         {
             int moneySpace = (selectedNode is not null) ? moneyHeight : smallMoneyHeight;
-            int height = Math.Max(minLines * lineHeight, (lineHeight * activeVariants.Count) + (verticalPadding * 2)) + moneySpace;
+            int height = Math.Max(minLines * lineHeight, (lineHeight * variantManager.activeVariants.Count) + (verticalPadding * 2)) + moneySpace;
             Draw.Rect(new Vector2(offset, topHeight - moneySpace), width, height, color);
         }
 
@@ -144,27 +108,27 @@ namespace Celeste.Mod.ARandomizerMod
             float xPos = offset + textOffset + scoreOffset;
             int moneySpace = (selectedNode is not null) ? moneyHeight : smallMoneyHeight;
             float yPos = topHeight - moneySpace + scorePadding;
-            ActiveFont.Draw("Score: " + score, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(scoreScale, scoreScale), scoreColor);
+            ActiveFont.Draw("Score: " + economyManager.score, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(scoreScale, scoreScale), scoreColor);
         }
 
         private void RenderMoneyBig()
         {
             float xPos = offset + textOffset + moneyOffset;
             float yPos = topHeight - moneyHeight + moneyPadding;
-            ActiveFont.Draw("$" + money, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(moneyScale, moneyScale), moneyColor);
+            ActiveFont.Draw("$" + economyManager.money, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(moneyScale, moneyScale), moneyColor);
         }
 
         private void RenderMoneySmall()
         {
             float xPos = offset + textOffset + smallMoneyOffset;
             float yPos = topHeight - smallMoneyHeight + smallMoneyPadding;
-            ActiveFont.Draw("$" + money, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(smallMoneyScale, smallMoneyScale), smallMoneyColor);
+            ActiveFont.Draw("$" + economyManager.money, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(smallMoneyScale, smallMoneyScale), smallMoneyColor);
         }
 
         private void RenderActiveVariants()
         {
-            LinkedListNode<Variant> node = activeVariants.First;
-            for (int line = 0; line < activeVariants.Count; line++)
+            LinkedListNode<Variant> node = variantManager.activeVariants.First;
+            for (int line = 0; line < variantManager.activeVariants.Count; line++)
             {
                 if (node == null) break; // for safety, should never happen
                 RenderVariant(node.Value, line);
@@ -181,7 +145,7 @@ namespace Celeste.Mod.ARandomizerMod
             Color color;
             if (selectedNode is not null && selectedNode.Value.name == variant.name)
             {
-                color = (variant.cost <= money) ? selectionColor : cantAffordSelectionColor;
+                color = (variant.cost <= economyManager.money) ? selectionColor : cantAffordSelectionColor;
             }
             else
             {
@@ -201,7 +165,7 @@ namespace Celeste.Mod.ARandomizerMod
             {
                 color = (selectedNode.Value.name.Equals(variant.name)) ? sellColor : sellSelectedColor;
             }
-            else if (variant.cost <= money)
+            else if (variant.cost <= economyManager.money)
             {
                 color = (selectedNode.Value.name.Equals(variant.name)) ? canAffordSelectedColor : canAffordColor;
             }
@@ -222,6 +186,7 @@ namespace Celeste.Mod.ARandomizerMod
             float yPos = topHeight + verticalPadding + (lineHeight * line);
             ActiveFont.Draw(text, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(textScale, textScale), color);
         }
+        #endregion
 
         public override void Update()
         {
@@ -237,67 +202,10 @@ namespace Celeste.Mod.ARandomizerMod
                 selectedNode = null;
             }
 
-            if (render && activeVariants.Count > 0)
+            if (render && variantManager.activeVariants.Count > 0)
             {
                 NavigateUI();
             }   
-        }
-
-        public void NavigateUI()
-        {
-            if (ARandomizerModModule.Settings.NavigateUp.Pressed)
-            {
-                ARandomizerModModule.Settings.NavigateUp.ConsumePress();
-                NavigateUp();
-            }
-            else if (ARandomizerModModule.Settings.NavigateDown.Pressed)
-            {
-                ARandomizerModModule.Settings.NavigateDown.ConsumePress();
-                NavigateDown();
-            }
-
-            if (ARandomizerModModule.Settings.Select.Pressed && selectedNode != null && selectedNode.Value != null)
-            {
-                ARandomizerModModule.Settings.Select.ConsumePress();
-                if (selectedNode.Value.cost <= money)
-                {
-                    money -= selectedNode.Value.cost;
-                    ResetVariant(selectedNode.Value);
-                    NavigateDown();
-                }
-            }
-        }
-
-        public void NavigateUp()
-        {
-            if (selectedNode == null)
-            {
-                selectedNode = activeVariants.Last;
-            }
-            else if (selectedNode.Previous != null)
-            {
-                selectedNode = selectedNode.Previous;
-            }
-            else
-            {
-                selectedNode = activeVariants.Last;
-            }
-        }
-
-        public void NavigateDown()
-        {
-            if (selectedNode == null)
-            {
-                selectedNode = activeVariants.First;
-            }
-            else if (selectedNode.Next != null)
-            {
-                selectedNode = selectedNode.Next;
-            }
-            else
-            {
-                selectedNode = activeVariants.First;
-            }
         }
 
         //StDummy breaks things like Badeline and chasers, oh well
@@ -320,98 +228,63 @@ namespace Celeste.Mod.ARandomizerMod
             player.StateMachine.State = Player.StNormal;
         }
 
-        public void TriggerVariant(Variant variant)
+        #region Navigation
+        public void NavigateUI()
         {
-            Logger.Log(LogLevel.Info, "ARandomizerMod", "Activating variant " + variant.name);
-            Random random = new();
-
-            if (variant is null)
+            if (ARandomizerModModule.Settings.NavigateUp.Pressed)
             {
-                Logger.Log("ARandomizerMod", "hi");
+                ARandomizerModModule.Settings.NavigateUp.ConsumePress();
+                NavigateUp();
+            }
+            else if (ARandomizerModModule.Settings.NavigateDown.Pressed)
+            {
+                ARandomizerModModule.Settings.NavigateDown.ConsumePress();
+                NavigateDown();
             }
 
-            switch (variant)
+            if (ARandomizerModModule.Settings.Select.Pressed && selectedNode != null && selectedNode.Value != null)
             {
-                case IntegerVariant integerVariant:
-                    int intValue = random.Next(integerVariant.minInt, integerVariant.maxInt);
-                    ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, intValue, false);
-                    variant.value = intValue.ToString();
-                    break;
-                case FloatVariant floatVariant:
-                    float floatValue = random.NextFloat(floatVariant.maxFloat - floatVariant.minFloat) + floatVariant.minFloat;
-                    ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, floatValue, false);
-                    variant.value = floatValue.ToString();
-                    break;
-                case BooleanVariant booleanVariant:
-                    bool boolValue = booleanVariant.status;
-                    ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, boolValue, false);
-                    variant.value = boolValue.ToString();
-                    foreach (Variant subVariant in booleanVariant.subVariants)
-                        TriggerVariant(subVariant);
-                    break;
-                case null:
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "JESSE: Null variant triggered");
-                    return;
-            }
-
-            foreach (Variant activeVariant in activeVariants)
-            {
-                if (activeVariant.name.Equals(variant.name))
+                ARandomizerModModule.Settings.Select.ConsumePress();
+                if (selectedNode.Value.cost <= economyManager.money)
                 {
-                    activeVariants.Remove(activeVariant);
-                    break;
+                    economyManager.PurchaseVariantRemoval(selectedNode.Value);
+                    NavigateDown();
                 }
             }
-
-            Logger.Log(LogLevel.Info, "ARandomizerMod", "Activated variant " + variant.name + " with value " + variant.value);
-            activeVariants.AddLast(variant);
         }
 
-        public void ResetRandomVariant()
+        public void NavigateUp()
         {
-            if (activeVariants.Count < 1) return;
-
-            int variantToReset = new Random().Next(activeVariants.Count);
-            LinkedListNode<Variant> node = activeVariants.First;
-            for (int i = 0; i < activeVariants.Count; i++)
+            if (selectedNode == null)
             {
-                if (i >= variantToReset && node.Value.cost < 200)
-                {
-                    ResetVariant(node.Value);
-                    return;
-                }
-
-                if (node.Next == null) return;
-                node = node.Next;
+                selectedNode = variantManager.activeVariants.Last;
+            }
+            else if (selectedNode.Previous != null)
+            {
+                selectedNode = selectedNode.Previous;
+            }
+            else
+            {
+                selectedNode = variantManager.activeVariants.Last;
             }
         }
 
-        public void ResetVariant(Variant variant)
+        public void NavigateDown()
         {
-            switch (variant)
+            if (selectedNode == null)
             {
-                case IntegerVariant integerVariant:
-                    ExtendedVariantImports.TriggerIntegerVariant?.Invoke(integerVariant.name, integerVariant.defaultInt, false);
-                    variant.value = integerVariant.value;
-                    break;
-                case FloatVariant floatVariant:
-                    ExtendedVariantImports.TriggerFloatVariant?.Invoke(floatVariant.name, floatVariant.defaultFloat, false);
-                    variant.value = floatVariant.value;
-                    break;
-                case BooleanVariant booleanVariant:
-                    ExtendedVariantImports.TriggerBooleanVariant?.Invoke(booleanVariant.name, !booleanVariant.status, false);
-                    variant.value = booleanVariant.value;
-                    foreach (Variant subVariant in booleanVariant.subVariants)
-                        ResetVariant(subVariant);
-                    break;
-                case null:
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "JESSE: Null variant triggered");
-                    return;
+                selectedNode = variantManager.activeVariants.First;
             }
-
-            Logger.Log(LogLevel.Info, "ARandomizerMod", "Resetting variant " + variant.name + " to value " + variant.value);
-            activeVariants.Remove(variant);
+            else if (selectedNode.Next != null)
+            {
+                selectedNode = selectedNode.Next;
+            }
+            else
+            {
+                selectedNode = variantManager.activeVariants.First;
+            }
         }
+        #endregion
     }
 }
 

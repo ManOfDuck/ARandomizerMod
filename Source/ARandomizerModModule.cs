@@ -9,8 +9,6 @@ using Lists = Celeste.Mod.ARandomizerMod.VariantLists;
 
 namespace Celeste.Mod.ARandomizerMod {
     public class ARandomizerModModule : EverestModule {
-
-
         public static ARandomizerModModule Instance { get; private set; }
 
         public override Type SettingsType => typeof(ARandomizerModModuleSettings);
@@ -19,24 +17,25 @@ namespace Celeste.Mod.ARandomizerMod {
         public override Type SessionType => typeof(ARandomizerModModuleSession);
         public static ARandomizerModModuleSession Session => (ARandomizerModModuleSession)Instance._Session;
 
-        VaraintsUI ui;
+        public VaraintsUI ui;
+        public VariantManager variantManager;
+        public EconomyManager economyManager;
 
         Dictionary<DifficultyOptions, int[]> variantRolls = new Dictionary<DifficultyOptions, int[]>();
-        int[] easyRolls = { 1, 2 };
+        readonly int[] easyRolls = { 1, 2 };
 
         Dictionary<DifficultyOptions, float[]> variantRanges = new Dictionary<DifficultyOptions, float[]>();
-        float[] easyRanges = { 0.05f, 0.15f, 0.35f, 0.5f, .65f, 0.75f, 0.85f, 0.9f,  0.95f };
+        readonly float[] easyRanges = { 0.05f, 0.15f, 0.35f, 0.5f, .65f, 0.75f, 0.85f, 0.9f,  0.95f };
 
         public ARandomizerModModule()
         {
             Instance = this;
             variantRolls.Add(DifficultyOptions.EASY, easyRolls);
-
             variantRanges.Add(DifficultyOptions.EASY, easyRanges);
 
 #if DEBUG   
             // debug builds use verbose logging
-            Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Warn);
+            Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Debug);
 #else
             // release builds use info logging to reduce spam in log files
             Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Info);
@@ -45,7 +44,10 @@ namespace Celeste.Mod.ARandomizerMod {
 
         public override void Load() {
             typeof(ExtendedVariantImports).ModInterop();
-            
+
+            variantManager = new();
+            economyManager = new(variantManager);
+
             On.Celeste.Level.LoadLevel += LevelLoad;
             On.Celeste.Level.Update += LevelUpdate;
             On.Celeste.Level.TransitionRoutine += RoomTransition;
@@ -53,7 +55,7 @@ namespace Celeste.Mod.ARandomizerMod {
 
         private void LevelUpdate(On.Celeste.Level.orig_Update orig, Level self)
         {
-            ui ??= new VaraintsUI
+            ui ??= new VaraintsUI(variantManager, economyManager)
             {
                 Active = true
             };
@@ -67,7 +69,7 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             orig(self, playerIntro, isFromLoader);
 
-            ui ??= new VaraintsUI
+            ui ??= new VaraintsUI(variantManager, economyManager)
                 {
                     Active = true
                 };
@@ -77,7 +79,7 @@ namespace Celeste.Mod.ARandomizerMod {
 
         private IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
         {
-            ui.RoomCleared();
+            economyManager.RoomCleared();
 
             DifficultyOptions difficulty = ARandomizerModModule.Settings.Difficulty;
 
@@ -92,7 +94,7 @@ namespace Celeste.Mod.ARandomizerMod {
                 if (v is null)
                     Logger.Log(LogLevel.Error, "ARandomizerMod", "Passing null hehe");
 
-                ui.TriggerVariant(v);
+                variantManager.TriggerVariant(v);
             }
    
             ui.Active = true;
@@ -117,7 +119,7 @@ namespace Celeste.Mod.ARandomizerMod {
             foreach (Variant v in list)
             {
                 Logger.Log(LogLevel.Warn, "ARandomizerMod", v.name);
-                ui.TriggerVariant(v);
+                variantManager.TriggerVariant(v);
             }
         }
 
@@ -165,7 +167,7 @@ namespace Celeste.Mod.ARandomizerMod {
                 }
                 else if (roll < ranges[8])
                 {
-                    ui.ResetRandomVariant();
+                    variantManager.ResetRandomVariant();
                 }
             }
 
