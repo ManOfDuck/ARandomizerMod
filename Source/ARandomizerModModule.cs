@@ -49,31 +49,25 @@ namespace Celeste.Mod.ARandomizerMod {
             economyManager = new(variantManager);
 
             On.Celeste.Level.LoadLevel += LevelLoad;
-            On.Celeste.Level.Update += LevelUpdate;
             On.Celeste.Level.TransitionRoutine += RoomTransition;
+            On.Celeste.LevelLoader.StartLevel += LevelStarted;
         }
 
-        private void LevelUpdate(On.Celeste.Level.orig_Update orig, Level self)
+        // TODO: this is activated on debug teleport too, maybe something to fix?
+        private void LevelStarted(On.Celeste.LevelLoader.orig_StartLevel orig, LevelLoader self)
         {
-            ui ??= new VaraintsUI(variantManager, economyManager)
-            {
-                Active = true
-            };
-            self.Add(ui);
-            ui.Update();
-            ui.Active = true;
             orig(self);
+            variantManager.ResetAllVariants();
         }
 
         private void LevelLoad(On.Celeste.Level.orig_LoadLevel orig, Level self, Player.IntroTypes playerIntro, bool isFromLoader)
         {
             orig(self, playerIntro, isFromLoader);
 
-            ui ??= new VaraintsUI(variantManager, economyManager)
-                {
-                    Active = true
-                };
-
+            ui = new VaraintsUI(variantManager, economyManager)
+            {
+                Active = true
+            };
             self.Add(ui);
         }
 
