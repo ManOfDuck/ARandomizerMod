@@ -177,7 +177,6 @@ namespace Celeste.Mod.ARandomizerMod {
         public override void Unload()
         {
             On.Celeste.Level.LoadLevel -= LevelLoad;
-            On.Celeste.Level.Update -= LevelUpdate;
             On.Celeste.Level.TransitionRoutine -= RoomTransition;
         }
     }
