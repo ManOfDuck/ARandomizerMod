@@ -5,13 +5,13 @@ namespace Celeste.Mod.ARandomizerMod
 	{
         public bool status;
 
-        public Variant[] subVariants = [];
+        public Variant[] subVariants = Array.Empty<Variant>();
 
         public BooleanVariant(String name, bool status, Level level, Variant[] subVariants = null)
             : base(name, level)
         {
             this.status = status;
-            this.subVariants = subVariants ?? [];
+            this.subVariants = subVariants ?? Array.Empty<Variant>();
         }
 
         public override void DoCost()

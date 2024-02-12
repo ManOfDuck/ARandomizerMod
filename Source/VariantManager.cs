@@ -74,8 +74,7 @@ namespace Celeste.Mod.ARandomizerMod
 
         public void ResetAllVariants()
         {
-            //Idk what this does but VS told me it was better than .ToArray()
-            Variant[] variantsToReset = [.. activeVariants];
+            Variant[] variantsToReset = activeVariants.ToArray();
 
             foreach (Variant variant in variantsToReset)
             {
