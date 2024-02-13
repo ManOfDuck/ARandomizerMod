@@ -5,12 +5,14 @@ using Monocle;
 using Celeste;
 using System.Collections.Generic;
 using System.Collections;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.ARandomizerMod
 {
 	public class VaraintsUI : Entity
 	{
         public bool render = false;
+        public bool controlsDisabled = false;
         public LinkedListNode<Variant> selectedNode;
 
         readonly VariantManager variantManager;
@@ -64,6 +66,14 @@ namespace Celeste.Mod.ARandomizerMod
             this.economyManager = economyManager;
 
             AddTag(Tags.HUD);
+
+           //On.Monocle.Binding.Pressed += Pressed;
+        }
+
+        private bool Pressed(On.Monocle.Binding.orig_Pressed orig, Binding self, int gamepadIndex, float threshold)
+        {
+            
+            return !render && orig(self, gamepadIndex, threshold);
         }
 
         #region Rendering
@@ -153,7 +163,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
             int offset = (variant.level == Variant.Level.SUB) ? subVariantOffset : 0;
             offset += (selectedNode is not null) ? costOffset : textOffset;
-            string text = variant.name + ": " + ExtendedVariantImports.GetCurrentVariantValue?.Invoke(variant.name);
+            string text = variant.name + ": " + variant.value;
             
             RenderText(text, color, line, offset);
         }
@@ -202,30 +212,54 @@ namespace Celeste.Mod.ARandomizerMod
                 selectedNode = null;
             }
 
+            if (controlsDisabled)
+            {
+                Input.MoveX.Value = 0;
+                Input.MoveY.Value = 0;
+            }
+
             if (render && variantManager.activeVariants.Count > 0)
             {
                 NavigateUI();
-            }   
+            }
         }
 
-        //StDummy breaks things like Badeline and chasers, oh well
         public void EnableUI()
         {
-            Player player = Scene?.Tracker?.GetEntity<Player>();
-            if (player is null) return;
-
             render = true;
-            player.StateMachine.State = Player.StDummy;
+            DisableControls();
         }
 
         public void DisableUI()
         {
             render = false;
+            EnableControls();
+        }
 
-            Player player = Scene.Tracker.GetEntity<Player>();
-            if (player is null) return;
+        // Hack - Trying to do any of this through input hooks bore no fruit after <6 hours, using Extended Variants instead. Works perfectly but pretty jank
+        private void DisableControls()
+        {
+            controlsDisabled = true;
 
-            player.StateMachine.State = Player.StNormal;
+            ExtendedVariantImports.TriggerIntegerVariant?.Invoke("JumpCount", 0, false);
+            ExtendedVariantImports.TriggerIntegerVariant?.Invoke("DashRestriction", 2, false);
+            ExtendedVariantImports.TriggerBooleanVariant?.Invoke("DisableWallJumping", true, false);
+            ExtendedVariantImports.TriggerBooleanVariant?.Invoke("NoGrabbing", true, false);
+        }
+
+        private void EnableControls()
+        {
+            controlsDisabled = false;
+
+            int jumpCount = Int32.Parse(variantManager.GetVariantWithName("JumpCount")?.value ?? "1");
+            int dashRestriction = Int32.Parse(variantManager.GetVariantWithName("DashRestriction")?.value ?? "0");
+            bool disableWallJumping = Boolean.Parse(variantManager.GetVariantWithName("DisableWallJumping")?.value ?? "False");
+            bool noGrabbing = Boolean.Parse(variantManager.GetVariantWithName("NoGrabbing")?.value ?? "False");
+
+            ExtendedVariantImports.TriggerIntegerVariant?.Invoke("JumpCount", jumpCount, false);
+            ExtendedVariantImports.TriggerIntegerVariant?.Invoke("DashRestriction", dashRestriction, false);
+            ExtendedVariantImports.TriggerBooleanVariant?.Invoke("DisableWallJumping", disableWallJumping, false);
+            ExtendedVariantImports.TriggerBooleanVariant?.Invoke("NoGrabbing", noGrabbing, false);
         }
 
         #region Navigation

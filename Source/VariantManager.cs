@@ -53,6 +53,19 @@ namespace Celeste.Mod.ARandomizerMod
             Logger.Log(LogLevel.Debug, "ARandomizerMod", "Activated variant " + variant.name + " with value " + variant.value);
         }
 
+        public Variant GetVariantWithName(string name)
+        {
+            foreach (Variant variant in activeVariants)
+            {
+                if (variant.name.Equals(name))
+                {
+                    return variant;
+                }
+            }
+
+            return null;
+        }
+
         public void ResetRandomVariant()
         {
             if (activeVariants.Count < 1) return;

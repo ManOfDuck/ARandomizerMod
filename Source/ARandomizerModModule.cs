@@ -33,13 +33,13 @@ namespace Celeste.Mod.ARandomizerMod {
             variantRolls.Add(DifficultyOptions.EASY, easyRolls);
             variantRanges.Add(DifficultyOptions.EASY, easyRanges);
 
-#if DEBUG   
+//#if DEBUG   
             // debug builds use verbose logging
             Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Debug);
-#else
+//#else
             // release builds use info logging to reduce spam in log files
-            Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Info);
-#endif
+            //Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Info);
+//#endif
         }
 
         public override void Load() {
