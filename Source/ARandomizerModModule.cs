@@ -64,7 +64,7 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             orig(self, playerIntro, isFromLoader);
 
-            ui = new VaraintsUI(variantManager, economyManager)
+            ui??= new VaraintsUI(variantManager, economyManager)
             {
                 Active = true
             };
@@ -90,8 +90,13 @@ namespace Celeste.Mod.ARandomizerMod {
 
                 variantManager.TriggerVariant(v);
             }
-   
-            ui.Active = true;
+
+            self.Remove(ui);
+            ui = new VaraintsUI(variantManager, economyManager)
+            {
+                Active = true
+            };
+            self.Add(ui);
 
             return orig(self, next, direction);
         }

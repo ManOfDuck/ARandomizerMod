@@ -6,6 +6,7 @@ using Celeste;
 using System.Collections.Generic;
 using System.Collections;
 using MonoMod.Utils;
+using Microsoft.Xna.Framework.Input;
 
 namespace Celeste.Mod.ARandomizerMod
 {
@@ -67,14 +68,19 @@ namespace Celeste.Mod.ARandomizerMod
 
             AddTag(Tags.HUD);
 
-           //On.Monocle.Binding.Pressed += Pressed;
+            On.Monocle.Binding.Pressed += Pressed;
         }
 
         private bool Pressed(On.Monocle.Binding.orig_Pressed orig, Binding self, int gamepadIndex, float threshold)
         {
-            
-            return !render && orig(self, gamepadIndex, threshold);
+            if (controlsDisabled)
+            {
+                Input.MoveX.Value = 0;
+                Input.MoveY.Value = 0;
+            }
+            return orig(self, gamepadIndex, threshold);
         }
+
 
         #region Rendering
         public override void Render()
@@ -211,13 +217,11 @@ namespace Celeste.Mod.ARandomizerMod
                 DisableUI();
                 selectedNode = null;
             }
-
             if (controlsDisabled)
             {
                 Input.MoveX.Value = 0;
                 Input.MoveY.Value = 0;
             }
-
             if (render && variantManager.activeVariants.Count > 0)
             {
                 NavigateUI();
