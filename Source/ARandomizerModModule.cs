@@ -6,6 +6,7 @@ using Monocle;
 using MonoMod.ModInterop;
 using DifficultyOptions = Celeste.Mod.ARandomizerMod.ARandomizerModModuleSettings.DifficultyOptions;
 using Lists = Celeste.Mod.ARandomizerMod.VariantLists;
+using Celeste.Mod.CelesteNet.DataTypes;
 
 namespace Celeste.Mod.ARandomizerMod {
     public class ARandomizerModModule : EverestModule {
@@ -27,6 +28,7 @@ namespace Celeste.Mod.ARandomizerMod {
         Dictionary<DifficultyOptions, float[]> variantRanges = new Dictionary<DifficultyOptions, float[]>();
         readonly float[] easyRanges = { 0.05f, 0.15f, 0.35f, 0.5f, .65f, 0.75f, 0.85f, 0.9f,  0.95f };
 
+
         public ARandomizerModModule()
         {
             Instance = this;
@@ -40,6 +42,11 @@ namespace Celeste.Mod.ARandomizerMod {
             // release builds use info logging to reduce spam in log files
             //Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Info);
 //#endif
+        }
+
+        public class TestType : DataType
+        {
+
         }
 
         public override void Load() {
