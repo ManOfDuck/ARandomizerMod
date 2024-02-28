@@ -21,17 +21,9 @@ namespace Celeste.Mod.ARandomizerMod {
         public VariantManager variantManager;
         public EconomyManager economyManager;
 
-        Dictionary<DifficultyOptions, int[]> variantRolls = new Dictionary<DifficultyOptions, int[]>();
-        readonly int[] easyRolls = { 1, 2 };
-
-        Dictionary<DifficultyOptions, float[]> variantRanges = new Dictionary<DifficultyOptions, float[]>();
-        readonly float[] easyRanges = { 0.05f, 0.15f, 0.35f, 0.5f, .65f, 0.75f, 0.85f, 0.9f,  0.95f };
-
         public ARandomizerModModule()
         {
             Instance = this;
-            variantRolls.Add(DifficultyOptions.EASY, easyRolls);
-            variantRanges.Add(DifficultyOptions.EASY, easyRanges);
 
 //#if DEBUG   
             // debug builds use verbose logging
@@ -64,6 +56,8 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             orig(self, playerIntro, isFromLoader);
 
+            Logger.Log(LogLevel.Error, "ARandomizerMod", self.ToString());
+
             ui??= new VaraintsUI(variantManager, economyManager)
             {
                 Active = true
@@ -75,21 +69,7 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             economyManager.RoomCleared();
 
-            DifficultyOptions difficulty = ARandomizerModModule.Settings.Difficulty;
-
-            int[] rollsRange = variantRolls[difficulty];
-            float[] ranges = variantRanges[difficulty];
-
-            List<Variant> variantsToActivate = GetRandomVariants(rollsRange, ranges);
-
-            foreach (Variant v in variantsToActivate)
-            {
-                //Logger.Log(LogLevel.Info, "ARandomizerMod", "Passing: " + v.name);
-                if (v is null)
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Passing null hehe");
-
-                variantManager.TriggerVariant(v);
-            }
+            variantManager.RoomLoaded(next);
 
             self.Remove(ui);
             ui = new VaraintsUI(variantManager, economyManager)
@@ -120,63 +100,6 @@ namespace Celeste.Mod.ARandomizerMod {
                 Logger.Log(LogLevel.Warn, "ARandomizerMod", v.name);
                 variantManager.TriggerVariant(v);
             }
-        }
-
-        private List<Variant> GetRandomVariants(int[] rollsRange, float[] ranges)
-        {
-            Random random = new();
-            int rolls = random.Next(rollsRange[0], rollsRange[1]);
-
-            List<Variant> variants = new();
-            for (int i = 0; i < rolls; i++)
-            {
-                float roll = random.NextFloat(1);
-
-                if (roll < ranges[0])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.FUCKED_UP));
-                }
-                else if (roll < ranges[1])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.nasty));
-                }
-                else if (roll < ranges[2])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.tame));
-                }
-                else if (roll < ranges[3])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.dubious));
-                }
-                else if (roll < ranges[4])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.silly));
-                }
-                else if (roll < ranges[5])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.nice));
-                }
-                else if (roll < ranges[6])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.good));
-                }
-                else if (roll < ranges[7])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.great));
-                }
-                else if (roll < ranges[8])
-                {
-                    variantManager.ResetRandomVariant();
-                }
-            }
-
-            return variants;
-        } 
-
-        private Variant GetRandomVariant(Variant[] variantList)
-        {
-            int variantIndex = new Random().Next(variantList.Length);
-            return variantList[variantIndex];
         }
 
         public override void Unload()
