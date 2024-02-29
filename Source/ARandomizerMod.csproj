@@ -32,8 +32,21 @@
             <Private>false</Private>
         </Reference>
 	<Reference Include="lib/CelesteNet.Shared.dll" />
+	<Reference Include="lib/CelesteNet.Client.dll" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Randomizer\" />
+      <None Remove="Randomizer\Variants\" />
+      <None Remove="CelesteNet\" />
+      <None Remove="CelesteNet\Data\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Randomizer\" />
+      <Folder Include="Randomizer\Variants\" />
+      <Folder Include="CelesteNet\" />
+      <Folder Include="CelesteNet\Data\" />
+    </ItemGroup>
     <Target Name="CopyFiles" AfterTargets="Build">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="..\bin" />
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).pdb" DestinationFolder="..\bin" />

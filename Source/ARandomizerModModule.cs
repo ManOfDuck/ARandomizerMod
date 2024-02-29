@@ -7,9 +7,13 @@ using MonoMod.ModInterop;
 using DifficultyOptions = Celeste.Mod.ARandomizerMod.ARandomizerModModuleSettings.DifficultyOptions;
 using Lists = Celeste.Mod.ARandomizerMod.VariantLists;
 using Celeste.Mod.CelesteNet.DataTypes;
+using Celeste.Mod.ARandomizerMod.CelesteNet;
+using Celeste.Mod.ARandomizerMod.Data;
 
 namespace Celeste.Mod.ARandomizerMod {
     public class ARandomizerModModule : EverestModule {
+        public static readonly string ProtocolVersion = "1_0_0";
+
         public static ARandomizerModModule Instance { get; private set; }
 
         public override Type SettingsType => typeof(ARandomizerModModuleSettings);
@@ -44,20 +48,38 @@ namespace Celeste.Mod.ARandomizerMod {
 //#endif
         }
 
-        public class TestType : DataType
-        {
-
-        }
-
         public override void Load() {
             typeof(ExtendedVariantImports).ModInterop();
 
             variantManager = new();
             economyManager = new(variantManager);
 
+            // Celeste Hooks
             On.Celeste.Level.LoadLevel += LevelLoad;
             On.Celeste.Level.TransitionRoutine += RoomTransition;
             On.Celeste.LevelLoader.StartLevel += LevelStarted;
+
+            // Multiplayer Events
+            CNetComm.OnReceiveTest += OnReceiveTest;
+
+            // Add CNet game object
+            Celeste.Instance.Components.Add(new CNetComm(Celeste.Instance));
+        }
+
+        private void OnReceiveTest(TestData data)
+        {
+            Logger.Log(LogLevel.Error, "ARandomizerMod", data?.Message);
+        }
+
+        public override void Unload()
+        {
+            // Celeste hooks
+            On.Celeste.Level.LoadLevel -= LevelLoad;
+            On.Celeste.Level.TransitionRoutine -= RoomTransition;
+            On.Celeste.LevelLoader.StartLevel -= LevelStarted;
+
+            if (Celeste.Instance.Components.Contains(CNetComm.Instance))
+                Celeste.Instance.Components.Remove(CNetComm.Instance);
         }
 
         // TODO: this is activated on debug teleport too, maybe something to fix?
@@ -81,6 +103,7 @@ namespace Celeste.Mod.ARandomizerMod {
         private IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
         {
             economyManager.RoomCleared();
+            CNetComm.Instance.SendTestMessage("Hello CelesteNet!");
 
             DifficultyOptions difficulty = ARandomizerModModule.Settings.Difficulty;
 
@@ -184,12 +207,6 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             int variantIndex = new Random().Next(variantList.Length);
             return variantList[variantIndex];
-        }
-
-        public override void Unload()
-        {
-            On.Celeste.Level.LoadLevel -= LevelLoad;
-            On.Celeste.Level.TransitionRoutine -= RoomTransition;
         }
     }
 }
