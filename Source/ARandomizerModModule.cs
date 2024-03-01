@@ -6,14 +6,9 @@ using Monocle;
 using MonoMod.ModInterop;
 using DifficultyOptions = Celeste.Mod.ARandomizerMod.ARandomizerModModuleSettings.DifficultyOptions;
 using Lists = Celeste.Mod.ARandomizerMod.VariantLists;
-using Celeste.Mod.CelesteNet.DataTypes;
-using Celeste.Mod.ARandomizerMod.CelesteNet;
-using Celeste.Mod.ARandomizerMod.Data;
 
 namespace Celeste.Mod.ARandomizerMod {
     public class ARandomizerModModule : EverestModule {
-        public static readonly string ProtocolVersion = "1_0_0";
-
         public static ARandomizerModModule Instance { get; private set; }
 
         public override Type SettingsType => typeof(ARandomizerModModuleSettings);
@@ -26,18 +21,9 @@ namespace Celeste.Mod.ARandomizerMod {
         public VariantManager variantManager;
         public EconomyManager economyManager;
 
-        Dictionary<DifficultyOptions, int[]> variantRolls = new Dictionary<DifficultyOptions, int[]>();
-        readonly int[] easyRolls = { 1, 2 };
-
-        Dictionary<DifficultyOptions, float[]> variantRanges = new Dictionary<DifficultyOptions, float[]>();
-        readonly float[] easyRanges = { 0.05f, 0.15f, 0.35f, 0.5f, .65f, 0.75f, 0.85f, 0.9f,  0.95f };
-
-
         public ARandomizerModModule()
         {
             Instance = this;
-            variantRolls.Add(DifficultyOptions.EASY, easyRolls);
-            variantRanges.Add(DifficultyOptions.EASY, easyRanges);
 
 //#if DEBUG   
             // debug builds use verbose logging
@@ -54,32 +40,9 @@ namespace Celeste.Mod.ARandomizerMod {
             variantManager = new();
             economyManager = new(variantManager);
 
-            // Celeste Hooks
             On.Celeste.Level.LoadLevel += LevelLoad;
             On.Celeste.Level.TransitionRoutine += RoomTransition;
             On.Celeste.LevelLoader.StartLevel += LevelStarted;
-
-            // Multiplayer Events
-            CNetComm.OnReceiveTest += OnReceiveTest;
-
-            // Add CNet game object
-            Celeste.Instance.Components.Add(new CNetComm(Celeste.Instance));
-        }
-
-        private void OnReceiveTest(TestData data)
-        {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", data?.Message);
-        }
-
-        public override void Unload()
-        {
-            // Celeste hooks
-            On.Celeste.Level.LoadLevel -= LevelLoad;
-            On.Celeste.Level.TransitionRoutine -= RoomTransition;
-            On.Celeste.LevelLoader.StartLevel -= LevelStarted;
-
-            if (Celeste.Instance.Components.Contains(CNetComm.Instance))
-                Celeste.Instance.Components.Remove(CNetComm.Instance);
         }
 
         // TODO: this is activated on debug teleport too, maybe something to fix?
@@ -93,6 +56,8 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             orig(self, playerIntro, isFromLoader);
 
+            Logger.Log(LogLevel.Error, "ARandomizerMod", self.ToString());
+
             ui??= new VaraintsUI(variantManager, economyManager)
             {
                 Active = true
@@ -103,23 +68,8 @@ namespace Celeste.Mod.ARandomizerMod {
         private IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
         {
             economyManager.RoomCleared();
-            CNetComm.Instance.SendTestMessage("Hello CelesteNet!");
 
-            DifficultyOptions difficulty = ARandomizerModModule.Settings.Difficulty;
-
-            int[] rollsRange = variantRolls[difficulty];
-            float[] ranges = variantRanges[difficulty];
-
-            List<Variant> variantsToActivate = GetRandomVariants(rollsRange, ranges);
-
-            foreach (Variant v in variantsToActivate)
-            {
-                //Logger.Log(LogLevel.Info, "ARandomizerMod", "Passing: " + v.name);
-                if (v is null)
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Passing null hehe");
-
-                variantManager.TriggerVariant(v);
-            }
+            variantManager.RoomLoaded(next);
 
             self.Remove(ui);
             ui = new VaraintsUI(variantManager, economyManager)
@@ -152,61 +102,10 @@ namespace Celeste.Mod.ARandomizerMod {
             }
         }
 
-        private List<Variant> GetRandomVariants(int[] rollsRange, float[] ranges)
+        public override void Unload()
         {
-            Random random = new();
-            int rolls = random.Next(rollsRange[0], rollsRange[1]);
-
-            List<Variant> variants = new();
-            for (int i = 0; i < rolls; i++)
-            {
-                float roll = random.NextFloat(1);
-
-                if (roll < ranges[0])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.FUCKED_UP));
-                }
-                else if (roll < ranges[1])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.nasty));
-                }
-                else if (roll < ranges[2])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.tame));
-                }
-                else if (roll < ranges[3])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.dubious));
-                }
-                else if (roll < ranges[4])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.silly));
-                }
-                else if (roll < ranges[5])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.nice));
-                }
-                else if (roll < ranges[6])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.good));
-                }
-                else if (roll < ranges[7])
-                {
-                    variants.Add(GetRandomVariant(VariantLists.great));
-                }
-                else if (roll < ranges[8])
-                {
-                    variantManager.ResetRandomVariant();
-                }
-            }
-
-            return variants;
-        } 
-
-        private Variant GetRandomVariant(Variant[] variantList)
-        {
-            int variantIndex = new Random().Next(variantList.Length);
-            return variantList[variantIndex];
+            On.Celeste.Level.LoadLevel -= LevelLoad;
+            On.Celeste.Level.TransitionRoutine -= RoomTransition;
         }
     }
 }
