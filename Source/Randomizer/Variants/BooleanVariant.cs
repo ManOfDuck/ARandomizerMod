@@ -14,7 +14,7 @@ namespace Celeste.Mod.ARandomizerMod
             this.subVariants = subVariants ?? Array.Empty<Variant>();
         }
 
-        public override void DoCost()
+        protected override void DoCost()
         {
             if (this.cost != 0) return;
 
@@ -22,7 +22,7 @@ namespace Celeste.Mod.ARandomizerMod
 
             foreach (Variant variant in subVariants)
             {
-                variant.cost = (int)((float) this.cost / subVariants.Length);
+                variant.cost = (int)(this.cost / (float) subVariants.Length);
             }
         }
     }

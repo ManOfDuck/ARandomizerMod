@@ -14,7 +14,7 @@ namespace Celeste.Mod.ARandomizerMod
 
         public string name;
 
-        public int cost { get => DoCost(); } 
+        public int cost;
 
         public enum Level { GREAT, GOOD, NICE, SILLY, DUBIOUS, TAME, NASTY, FUCKED_UP, SUB };
         public Level level;
@@ -28,39 +28,35 @@ namespace Celeste.Mod.ARandomizerMod
             DoCost();
         }
 
-        virtual protected int DoCost()
+        virtual protected void DoCost()
         {
-            int retCost = 0;
-
             switch (level)
             {
                 case Level.GREAT:
-                    retCost = greatPrice;
+                    cost = greatPrice;
                     break;
                 case Level.GOOD:
-                    retCost = goodPrice;
+                    cost = goodPrice;
                     break;
                 case Level.NICE:
-                    retCost = nicePrice;
+                    cost = nicePrice;
                     break;
                 case Level.SILLY:
-                    retCost = sillyPrice;
+                    cost = sillyPrice;
                     break;
                 case Level.DUBIOUS:
-                    retCost = dubiousPrice;
+                    cost = dubiousPrice;
                     break;
                 case Level.TAME:
-                    retCost = tamePrice;
+                    cost = tamePrice;
                     break;
                 case Level.NASTY:
-                    retCost = nastyPrice;
+                    cost = nastyPrice;
                     break;
                 case Level.FUCKED_UP:
-                    retCost = fuckedUpPrice;
+                    cost = fuckedUpPrice;
                     break;
             }
-
-            return retCost;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Celeste.Mod.ARandomizerMod
             else
             {
                 RandomizeNewVariants();
-                variantsByRoom.Add(room, activeVariants);
+                variantsByRoom.Add(room, new LinkedList<Variant>(activeVariants));
             }
         }
 
@@ -43,11 +43,13 @@ namespace Celeste.Mod.ARandomizerMod
 
         private void MatchVariantList(LinkedList<Variant> targetList)
         {
-            foreach (Variant variant in activeVariants)
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "matching");
+            foreach (Variant variant in activeVariants.ToArray()) // Convert to array to avoid concurrent modification exceptions
             {
                 if (!targetList.Contains(variant))
                 {
                     ResetVariant(variant);
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "reset");
                 }
             }
             foreach (Variant variant in targetList)
@@ -55,6 +57,7 @@ namespace Celeste.Mod.ARandomizerMod
                 if (!activeVariants.Contains(variant))
                 {
                     TriggerVariant(variant);
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "add");
                 }
             }
         }

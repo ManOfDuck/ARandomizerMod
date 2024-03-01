@@ -9,6 +9,8 @@ using Lists = Celeste.Mod.ARandomizerMod.VariantLists;
 
 namespace Celeste.Mod.ARandomizerMod {
     public class ARandomizerModModule : EverestModule {
+        public static readonly string ProtocolVersion = "1_0_0";
+
         public static ARandomizerModModule Instance { get; private set; }
 
         public override Type SettingsType => typeof(ARandomizerModModuleSettings);
@@ -55,8 +57,6 @@ namespace Celeste.Mod.ARandomizerMod {
         private void LevelLoad(On.Celeste.Level.orig_LoadLevel orig, Level self, Player.IntroTypes playerIntro, bool isFromLoader)
         {
             orig(self, playerIntro, isFromLoader);
-
-            Logger.Log(LogLevel.Error, "ARandomizerMod", self.ToString());
 
             ui??= new VaraintsUI(variantManager, economyManager)
             {
