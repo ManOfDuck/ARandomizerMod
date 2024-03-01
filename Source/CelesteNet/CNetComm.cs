@@ -68,7 +68,7 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
         #region handlers
         public void Handle(CelesteNetConnection con, TestData data)
         {
-            data.player ??= CnetClient.PlayerInfo;  // It's null when handling our own messages
+            data.player ??= CnetClient?.PlayerInfo;  // It's null when handling our own messages, set it to our current player if connected
             updateQueue.Enqueue(() => OnReceiveTest?.Invoke(data));
         }
         #endregion
@@ -114,12 +114,15 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
 
         public void SendTestMessage(string message)
         {
-            //if (!CanSendMessages) return;
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Broadcasting hello");
-            CnetClient.SendAndHandle(new TestData()
+            TestData data = new TestData()
             {
                 Message = message
-            });
+            };
+            if (!CanSendMessages)
+                // if in singleplayer, skip sending the message to the server
+                Handle(null, data);
+            else 
+                CnetClient.SendAndHandle(data);
         }
     }
 }
