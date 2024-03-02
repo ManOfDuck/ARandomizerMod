@@ -34,21 +34,25 @@ namespace Celeste.Mod.ARandomizerMod
         public static BooleanVariant ReadBooleanVariant(this CelesteNetBinaryReader reader)
         {
             // Read base data
-            BooleanVariant booleanVariant = (BooleanVariant)VariantExt.ReadVariantBase(reader);
+            string name = reader.ReadString();
+            Variant.Level level = (Variant.Level)reader.ReadInt32();
+            string value = reader.ReadString();
 
             // Read class-specific data
-            booleanVariant.status = reader.ReadBoolean();
+            Boolean status = reader.ReadBoolean();
 
             // Read length of sub-variant array
             int numSubVariants = reader.ReadInt32();
-            booleanVariant.subVariants = new Variant[numSubVariants];
+            Variant[] subVariants = new Variant[numSubVariants];
 
             // Read variants to sub-variant array
             for (int i = 0; i < numSubVariants; i++)
             {
-                booleanVariant.subVariants[i] = reader.ReadVariant();
+                subVariants[i] = reader.ReadVariant();
             }
 
+            // Deserialize variant
+            BooleanVariant booleanVariant = new(name, status, level, subVariants);
             return booleanVariant;
         }
 

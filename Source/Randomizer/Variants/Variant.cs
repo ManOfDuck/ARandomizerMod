@@ -93,22 +93,6 @@ namespace Celeste.Mod.ARandomizerMod
             }
         }
 
-
-        // Called by variant classes to read shared members
-        public static Variant ReadVariantBase(CelesteNetBinaryReader reader)
-        {
-            string name = reader.ReadString();
-            Variant.Level level = (Variant.Level)reader.ReadInt32();
-            string value = reader.ReadString();
-
-            Variant variant = new(name, level)
-            {
-                value = value
-            };
-
-            return variant;
-        }
-
         // Called by variant classes to write shared members
         public static void WriteVariantBase(CelesteNetBinaryWriter writer, Variant variant)
         {

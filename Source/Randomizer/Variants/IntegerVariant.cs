@@ -23,12 +23,20 @@ namespace Celeste.Mod.ARandomizerMod
         public static IntegerVariant ReadIntegerVariant(this CelesteNetBinaryReader reader)
         {
             // Read base data
-            IntegerVariant integerVariant = (IntegerVariant) VariantExt.ReadVariantBase(reader);
+            string name = reader.ReadString();
+            Variant.Level level = (Variant.Level)reader.ReadInt32();
+            string value = reader.ReadString();
 
             // Read class-specific data
-            integerVariant.minInt = reader.ReadInt32();
-            integerVariant.maxInt = reader.ReadInt32();
-            integerVariant.defaultInt = reader.ReadInt32();
+            int minInt = reader.ReadInt32();
+            int maxInt = reader.ReadInt32();
+            int defaultInt = reader.ReadInt32();
+
+            // Deserialize variant
+            IntegerVariant integerVariant = new(name, minInt, maxInt, defaultInt, level)
+            {
+                value = value
+            };
 
             return integerVariant;
         }
