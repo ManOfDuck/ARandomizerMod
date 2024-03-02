@@ -92,7 +92,6 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
             Instance = this;
             CelesteNetClientContext.OnStart += OnCNetClientContextStart;
             Disposed += OnComponentDisposed;
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Ctr called");
         }
 
         private void OnCNetClientContextStart(CelesteNetClientContext cxt)
@@ -137,6 +136,7 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
 
         public void SendVariantUpdate(string roomName, Variant variant, VariantUpdateData.Operation operation)
         {
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Sending Update");
             VariantUpdateData data = new()
             {
                 roomName = roomName,

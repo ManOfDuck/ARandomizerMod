@@ -34,7 +34,7 @@ namespace Celeste.Mod.ARandomizerMod
                 // Update this room for all clients
                 foreach (Variant variant in activeVariants)
                 {
-                    CNetComm.Instance?.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
+                    CNetComm.Instance.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
                 }
             }
         }

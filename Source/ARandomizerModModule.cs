@@ -48,6 +48,9 @@ namespace Celeste.Mod.ARandomizerMod {
 
             // Multiplayer Events
             CNetComm.OnReceiveVariantUpdate += OnVariantUpdate;
+
+            // Add CNet game object
+            Celeste.Instance.Components.Add(new CNetComm(Celeste.Instance));
         }
 
         public override void Unload()
@@ -56,7 +59,8 @@ namespace Celeste.Mod.ARandomizerMod {
             On.Celeste.Level.TransitionRoutine -= RoomTransition;
             On.Celeste.LevelLoader.StartLevel -= LevelStarted;
 
-
+            if (Celeste.Instance.Components.Contains(CNetComm.Instance))
+                Celeste.Instance.Components.Remove(CNetComm.Instance);
         }
 
         // TODO: this is activated on debug teleport too, maybe something to fix?
