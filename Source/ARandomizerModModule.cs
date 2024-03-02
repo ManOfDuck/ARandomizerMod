@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Celeste.Mod.ARandomizerMod.CelesteNet;
+using Celeste.Mod.ARandomizerMod.CelesteNet.Data;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.ModInterop;
@@ -15,9 +17,6 @@ namespace Celeste.Mod.ARandomizerMod {
 
         public override Type SettingsType => typeof(ARandomizerModModuleSettings);
         public static ARandomizerModModuleSettings Settings => (ARandomizerModModuleSettings)Instance._Settings;
-
-        public override Type SessionType => typeof(ARandomizerModModuleSession);
-        public static ARandomizerModModuleSession Session => (ARandomizerModModuleSession)Instance._Session;
 
         public VaraintsUI ui;
         public VariantManager variantManager;
@@ -42,9 +41,22 @@ namespace Celeste.Mod.ARandomizerMod {
             variantManager = new();
             economyManager = new(variantManager);
 
+            // Celeste Hooks
             On.Celeste.Level.LoadLevel += LevelLoad;
             On.Celeste.Level.TransitionRoutine += RoomTransition;
             On.Celeste.LevelLoader.StartLevel += LevelStarted;
+
+            // Multiplayer Events
+            CNetComm.OnReceiveVariantUpdate += OnVariantUpdate;
+        }
+
+        public override void Unload()
+        {
+            On.Celeste.Level.LoadLevel -= LevelLoad;
+            On.Celeste.Level.TransitionRoutine -= RoomTransition;
+            On.Celeste.LevelLoader.StartLevel -= LevelStarted;
+
+
         }
 
         // TODO: this is activated on debug teleport too, maybe something to fix?
@@ -68,7 +80,6 @@ namespace Celeste.Mod.ARandomizerMod {
         private IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
         {
             economyManager.RoomCleared();
-
             variantManager.RoomLoaded(next);
 
             self.Remove(ui);
@@ -79,6 +90,12 @@ namespace Celeste.Mod.ARandomizerMod {
             self.Add(ui);
 
             return orig(self, next, direction);
+        }
+
+        private void OnVariantUpdate(VariantUpdateData data)
+        {
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "event received");
+            variantManager?.ProcessVariantUpdate(data);
         }
 
         private void TestAllVariants()
@@ -100,12 +117,6 @@ namespace Celeste.Mod.ARandomizerMod {
                 Logger.Log(LogLevel.Warn, "ARandomizerMod", v.name);
                 variantManager.TriggerVariant(v);
             }
-        }
-
-        public override void Unload()
-        {
-            On.Celeste.Level.LoadLevel -= LevelLoad;
-            On.Celeste.Level.TransitionRoutine -= RoomTransition;
         }
     }
 }

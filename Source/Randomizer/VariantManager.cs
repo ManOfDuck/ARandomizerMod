@@ -1,4 +1,6 @@
-﻿using Monocle;
+﻿using Celeste.Mod.ARandomizerMod.CelesteNet;
+using Celeste.Mod.ARandomizerMod.CelesteNet.Data;
+using Monocle;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,20 +11,102 @@ namespace Celeste.Mod.ARandomizerMod
 {
     public class VariantManager
     {
-        public Dictionary<LevelData, LinkedList<Variant>> variantsByRoom = new();
+        private readonly string AllRoomsIdentifier = "ALL_ROOMS";
+
+        public Dictionary<string, LinkedList<Variant>> variantsByRoomName = new();
         public LinkedList<Variant> activeVariants = new();
+        private LevelData currentRoom;
 
         public void RoomLoaded(LevelData room)
         {
-            if (variantsByRoom.ContainsKey(room))
+            currentRoom = room;
+            Logger.Log(LogLevel.Error, "ARandomizerMod", room.Name);
+
+            if (variantsByRoomName.ContainsKey(room.Name))
             {
-                MatchVariantList(variantsByRoom[room]);
+                MatchVariantList(variantsByRoomName[room.Name]);
             }
             else
             {
+                // Update active variants
                 RandomizeNewVariants();
-                variantsByRoom.Add(room, new LinkedList<Variant>(activeVariants));
+
+                // Update this room for all clients
+                foreach (Variant variant in activeVariants)
+                {
+                    CNetComm.Instance?.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
+                }
             }
+        }
+
+        public void ProcessVariantUpdate(VariantUpdateData data)
+        {
+            string roomName = data.roomName;
+            Variant variant = data.variant;
+            VariantUpdateData.Operation operation = data.operation;
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Processing event");
+
+            if (roomName.Equals(AllRoomsIdentifier))
+            {
+                // Peform opertaion on all existing rooms
+                switch (operation)
+                {
+                    case VariantUpdateData.Operation.ADD:
+                        AddVariantToAllRooms(variant);
+                        break;
+                    case VariantUpdateData.Operation.REMOVE:
+                        RemoveVariantFromAllRooms(variant);
+                        break;
+                    default:
+                        Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Operation");
+                        break;
+                }
+
+                MatchVariantList(variantsByRoomName[currentRoom.Name]);
+            }
+            else if (roomName is not null)
+            {
+                // Create a new dictionary entry, if neccessary
+                if (!variantsByRoomName.ContainsKey(roomName))
+                    variantsByRoomName.Add(roomName, new());
+
+                switch (operation)
+                {
+                    case VariantUpdateData.Operation.ADD:
+                        Logger.Log(LogLevel.Error, "ARandomizerMod", "Adding variant");
+                        variantsByRoomName[roomName].AddLast(variant);
+                        break;
+                    case VariantUpdateData.Operation.REMOVE:
+                        variantsByRoomName[roomName].Remove(variant);
+                        break;
+                    default:
+                        Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Operation");
+                        break;
+                }
+
+                // If we're in this room, update our variants
+                if (currentRoom.Name.Equals(roomName))
+                {
+                    MatchVariantList(variantsByRoomName[roomName]);
+                }
+            }
+        }
+
+        private void AddVariantToAllRooms(Variant variant)
+        {
+            foreach (string roomName in variantsByRoomName.Keys)
+            {
+                variantsByRoomName[roomName].AddLast(variant);
+            }
+        }
+
+        private void RemoveVariantFromAllRooms(Variant variant)
+        {
+            foreach (string roomName in variantsByRoomName.Keys)
+            {
+                variantsByRoomName[roomName].Remove(variant);
+            }
+
         }
 
         private void RandomizeNewVariants()

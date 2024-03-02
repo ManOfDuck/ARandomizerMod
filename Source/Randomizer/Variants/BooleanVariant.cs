@@ -1,4 +1,6 @@
 ﻿using System;
+using Celeste.Mod.CelesteNet;
+
 namespace Celeste.Mod.ARandomizerMod
 {
 	public class BooleanVariant : Variant
@@ -20,9 +22,52 @@ namespace Celeste.Mod.ARandomizerMod
 
             base.DoCost();
 
-            foreach (Variant variant in subVariants)
+            foreach (Variant subVariant in subVariants)
             {
-                variant.cost = (int)(this.cost / (float) subVariants.Length);
+                subVariant.cost = (int)(this.cost / (float) subVariants.Length);
+            }
+        }
+    }
+
+    public static class BooleanVariantExt
+    {
+        public static BooleanVariant ReadBooleanVariant(this CelesteNetBinaryReader reader)
+        {
+            // Read base data
+            BooleanVariant booleanVariant = (BooleanVariant)VariantExt.ReadVariantBase(reader);
+
+            // Read class-specific data
+            booleanVariant.status = reader.ReadBoolean();
+
+            // Read length of sub-variant array
+            int numSubVariants = reader.ReadInt32();
+            booleanVariant.subVariants = new Variant[numSubVariants];
+
+            // Read variants to sub-variant array
+            for (int i = 0; i < numSubVariants; i++)
+            {
+                booleanVariant.subVariants[i] = reader.ReadVariant();
+            }
+
+            return booleanVariant;
+        }
+
+        public static void Write(this CelesteNetBinaryWriter writer, BooleanVariant booleanVariant)
+        {
+            // Write base data
+            VariantExt.WriteVariantBase(writer, booleanVariant);
+
+            // Write class-specific data
+            writer.Write((Variant)booleanVariant);
+            writer.Write(booleanVariant.status);
+
+            // Get length of sub-variant array
+            writer.Write(booleanVariant.subVariants.Length);
+
+            // Write variants to sub-variant array
+            foreach (Variant subVariant in booleanVariant.subVariants)
+            {
+                writer.Write(subVariant);
             }
         }
     }
