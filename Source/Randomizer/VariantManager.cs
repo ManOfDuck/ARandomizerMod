@@ -11,7 +11,7 @@ namespace Celeste.Mod.ARandomizerMod
 {
     public class VariantManager
     {
-        private readonly string AllRoomsIdentifier = "ALL_ROOMS";
+        public static readonly string AllRoomsIdentifier = "ALL_ROOMS";
 
         public Dictionary<string, LinkedList<Variant>> variantsByRoomName = new();
         public LinkedList<Variant> activeVariants = new();

@@ -1,4 +1,5 @@
-﻿using Monocle;
+﻿using Celeste.Mod.ARandomizerMod.CelesteNet;
+using Monocle;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -68,7 +69,7 @@ namespace Celeste.Mod.ARandomizerMod
         public void PurchaseVariantRemoval(Variant variant)
         {
             money -= variant.cost;
-            variantManager.ResetVariant(variant);
+            CNetComm.Instance.SendVariantUpdate(VariantManager.AllRoomsIdentifier, variant, CelesteNet.Data.VariantUpdateData.Operation.REMOVE);
         }
     }
 }
