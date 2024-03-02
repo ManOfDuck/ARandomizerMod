@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Celeste.Mod.ARandomizerMod.CelesteNet;
 using Celeste.Mod.ARandomizerMod.CelesteNet.Data;
+using Celeste.Mod.ARandomizerMod.Data;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.ModInterop;
@@ -48,9 +49,15 @@ namespace Celeste.Mod.ARandomizerMod {
 
             // Multiplayer Events
             CNetComm.OnReceiveVariantUpdate += OnVariantUpdate;
+            CNetComm.OnReceiveTest += OnReceiveTest;
 
             // Add CNet game object
             Celeste.Instance.Components.Add(new CNetComm(Celeste.Instance));
+        }
+
+        private void OnReceiveTest(TestData data)
+        {
+            Logger.Log(LogLevel.Error, "ARandomizerMod", data.Message);
         }
 
         public override void Unload()
@@ -85,6 +92,8 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             economyManager.RoomCleared();
             variantManager.RoomLoaded(next);
+
+            CNetComm.Instance.SendTestMessage("hello grilfriend");
 
             self.Remove(ui);
             ui = new VaraintsUI(variantManager, economyManager)
