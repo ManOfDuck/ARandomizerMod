@@ -85,7 +85,7 @@ namespace Celeste.Mod.ARandomizerMod
                 }
 
                 // If we're in this room, update our variants
-                if (currentRoom.Name.Equals(roomName))
+                if (currentRoom?.Name.Equals(roomName) == true)
                 {
                     MatchVariantList(variantsByRoomName[roomName]);
                 }
