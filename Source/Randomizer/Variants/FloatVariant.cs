@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Celeste.Mod.CelesteNet;
 
 namespace Celeste.Mod.ARandomizerMod
@@ -20,7 +21,7 @@ namespace Celeste.Mod.ARandomizerMod
 
     public static class FloatVariantExt
     {
-        public static IntegerVariant ReadFloatVariant(this CelesteNetBinaryReader reader)
+        public static FloatVariant ReadFloatVariant(this CelesteNetBinaryReader reader)
         {
             // Read base data
             string name = reader.ReadString();
@@ -28,12 +29,12 @@ namespace Celeste.Mod.ARandomizerMod
             string value = reader.ReadString();
 
             // Read class-specific data
-            int minFloat = reader.ReadInt32();
-            int maxFloat = reader.ReadInt32();
-            int defaultFloat = reader.ReadInt32();
+            float minFloat = reader.ReadSingle();
+            float maxFloat = reader.ReadSingle();
+            float defaultFloat = reader.ReadSingle();
 
             // Deserialize variant
-            IntegerVariant floatVariant = new(name, minFloat, maxFloat, defaultFloat, level)
+            FloatVariant floatVariant = new(name, minFloat, maxFloat, defaultFloat, level)
             {
                 value = value
             };
