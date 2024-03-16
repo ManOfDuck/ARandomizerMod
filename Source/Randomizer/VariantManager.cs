@@ -34,6 +34,7 @@ namespace Celeste.Mod.ARandomizerMod
                 // Update this room for all clients
                 foreach (Variant variant in activeVariants)
                 {
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Sending variant " + variant.name + " with value " + variant.value);
                     CNetComm.Instance.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
                 }
             }
@@ -44,7 +45,7 @@ namespace Celeste.Mod.ARandomizerMod
             string roomName = data.roomName;
             Variant variant = data.variant;
             VariantUpdateData.Operation operation = data.operation;
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Processing event");
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Received variant " + variant.name + " with value " + variant.value);
 
             if (roomName.Equals(AllRoomsIdentifier))
             {
