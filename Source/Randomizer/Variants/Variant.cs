@@ -26,7 +26,7 @@ namespace Celeste.Mod.ARandomizerMod
         public enum Level { GREAT, GOOD, NICE, SILLY, DUBIOUS, TAME, NASTY, FUCKED_UP, SUB };
         public Level level;
 
-        public string value;
+        public string valueString;
 
         public Variant(String name, Level level)
         {
@@ -38,6 +38,16 @@ namespace Celeste.Mod.ARandomizerMod
         virtual protected void DoCost()
         {
             cost = costPerLevel[level];
+        }
+
+        virtual public void Trigger()
+        {
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented TriggerVariant() method");
+        }
+
+        virtual public void Reset()
+        {
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented ResetVariant() method");
         }
     }
 
@@ -98,7 +108,6 @@ namespace Celeste.Mod.ARandomizerMod
         {
             writer.Write(variant.name);
             writer.Write((int)variant.level);
-            writer.Write(variant.value);
         }
     }
 }

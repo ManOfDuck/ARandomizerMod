@@ -34,7 +34,7 @@ namespace Celeste.Mod.ARandomizerMod
                 // Update this room for all clients
                 foreach (Variant variant in activeVariants)
                 {
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Sending variant " + variant.name + " with value " + variant.value);
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Sending variant " + variant.name + " with value " + variant.valueString);
                     CNetComm.Instance.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
                 }
             }
@@ -45,7 +45,7 @@ namespace Celeste.Mod.ARandomizerMod
             string roomName = data.roomName;
             Variant variant = data.variant;
             VariantUpdateData.Operation operation = data.operation;
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Received variant " + variant.name + " with value " + variant.value);
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Received variant " + variant.name + " with value " + variant.valueString);
 
             if (roomName.Equals(AllRoomsIdentifier))
             {
@@ -150,31 +150,7 @@ namespace Celeste.Mod.ARandomizerMod
         public void TriggerVariant(Variant variant)
         {
             Logger.Log(LogLevel.Debug, "ARandomizerMod", "Activating variant " + variant.name + "...");
-            Random random = new();
-
-            switch (variant)
-            {
-                case IntegerVariant integerVariant:
-                    int intValue = random.Next(integerVariant.minInt, integerVariant.maxInt);
-                    ExtendedVariantImports.TriggerIntegerVariant?.Invoke(variant.name, intValue, false);
-                    variant.value = intValue.ToString();
-                    break;
-                case FloatVariant floatVariant:
-                    float floatValue = random.NextFloat(floatVariant.maxFloat - floatVariant.minFloat) + floatVariant.minFloat;
-                    ExtendedVariantImports.TriggerFloatVariant?.Invoke(variant.name, floatValue, false);
-                    variant.value = floatValue.ToString();
-                    break;
-                case BooleanVariant booleanVariant:
-                    bool boolValue = booleanVariant.status;
-                    ExtendedVariantImports.TriggerBooleanVariant?.Invoke(variant.name, boolValue, false);
-                    variant.value = boolValue.ToString();
-                    foreach (Variant subVariant in booleanVariant.subVariants)
-                        TriggerVariant(subVariant);
-                    break;
-                case null:
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "JESSE: Null variant triggered");
-                    return;
-            }
+            variant.Trigger();
 
             foreach (Variant activeVariant in activeVariants)
             {
@@ -186,7 +162,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
 
             activeVariants.AddLast(variant);
-            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Activated variant " + variant.name + " with value " + variant.value);
+            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Activated variant " + variant.name + " with value " + variant.valueString);
         }
 
         public Variant GetVariantWithName(string name)
@@ -205,29 +181,10 @@ namespace Celeste.Mod.ARandomizerMod
         {
             Logger.Log(LogLevel.Debug, "ARandomizerMod", "Resetting variant " + variant.name + "...");
 
-            switch (variant)
-            {
-                case IntegerVariant integerVariant:
-                    ExtendedVariantImports.TriggerIntegerVariant?.Invoke(integerVariant.name, integerVariant.defaultInt, false);
-                    variant.value = integerVariant.value;
-                    break;
-                case FloatVariant floatVariant:
-                    ExtendedVariantImports.TriggerFloatVariant?.Invoke(floatVariant.name, floatVariant.defaultFloat, false);
-                    variant.value = floatVariant.value;
-                    break;
-                case BooleanVariant booleanVariant:
-                    ExtendedVariantImports.TriggerBooleanVariant?.Invoke(booleanVariant.name, !booleanVariant.status, false);
-                    variant.value = booleanVariant.value;
-                    foreach (Variant subVariant in booleanVariant.subVariants)
-                        ResetVariant(subVariant);
-                    break;
-                case null:
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "JESSE: Null variant triggered");
-                    return;
-            }
-
+            variant.Reset();
             activeVariants.Remove(variant);
-            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Reset variant " + variant.name + " to value " + variant.value);
+
+            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Reset variant " + variant.name + " to value " + variant.valueString);
         }
 
         public void ResetRandomVariant()

@@ -3,8 +3,8 @@ using Celeste.Mod.CelesteNet;
 
 namespace Celeste.Mod.ARandomizerMod
 {
-	public class BooleanVariant : Variant
-	{
+    public class BooleanVariant : Variant
+    {
         public bool status;
 
         public Variant[] subVariants = Array.Empty<Variant>();
@@ -24,8 +24,24 @@ namespace Celeste.Mod.ARandomizerMod
 
             foreach (Variant subVariant in subVariants)
             {
-                subVariant.cost = (int)(this.cost / (float) subVariants.Length);
+                subVariant.cost = (int)(this.cost / (float)subVariants.Length);
             }
+        }
+
+        new public void Trigger()
+        {
+            valueString = status.ToString();
+            ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, status, false);
+            foreach (Variant subVariant in subVariants)
+                subVariant.Trigger();
+        }
+
+        new public void Reset()
+        {
+            valueString = (!status).ToString();
+            ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, !status, false);
+            foreach (Variant subVariant in subVariants)
+                subVariant.Reset();
         }
     }
 
