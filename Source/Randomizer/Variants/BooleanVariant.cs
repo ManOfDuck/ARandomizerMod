@@ -52,7 +52,7 @@ namespace Celeste.Mod.ARandomizerMod
             // Read base data
             string name = reader.ReadString();
             Variant.Level level = (Variant.Level)reader.ReadInt32();
-            string value = reader.ReadString();
+            string valueString = reader.ReadString();
 
             // Read class-specific data
             Boolean status = reader.ReadBoolean();
@@ -68,7 +68,10 @@ namespace Celeste.Mod.ARandomizerMod
             }
 
             // Deserialize variant
-            BooleanVariant booleanVariant = new(name, status, level, subVariants);
+            BooleanVariant booleanVariant = new(name, status, level, subVariants)
+            {
+                valueString = valueString
+            };
             return booleanVariant;
         }
 

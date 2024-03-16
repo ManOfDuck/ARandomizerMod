@@ -108,6 +108,7 @@ namespace Celeste.Mod.ARandomizerMod
         {
             writer.Write(variant.name);
             writer.Write((int)variant.level);
+            writer.Write(variant.valueString);
         }
     }
 }

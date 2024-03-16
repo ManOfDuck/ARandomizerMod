@@ -50,6 +50,7 @@ namespace Celeste.Mod.ARandomizerMod
             // Read base data
             string name = reader.ReadString();
             Variant.Level level = (Variant.Level)reader.ReadInt32();
+            string valueString = reader.ReadString();
 
             // Read class-specific data
             float minFloat = reader.ReadSingle();
@@ -58,8 +59,11 @@ namespace Celeste.Mod.ARandomizerMod
             float floatValue = reader.ReadSingle();
 
             // Deserialize variant
-            FloatVariant floatVariant = new(name, minFloat, maxFloat, defaultFloat, level);
-            floatVariant.SetValue(floatValue);
+            FloatVariant floatVariant = new(name, minFloat, maxFloat, defaultFloat, level)
+            {
+                valueString = valueString,
+                floatValue = floatValue
+            };
 
             return floatVariant;
         }

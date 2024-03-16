@@ -52,6 +52,7 @@ namespace Celeste.Mod.ARandomizerMod
             // Read base data
             string name = reader.ReadString();
             Variant.Level level = (Variant.Level)reader.ReadInt32();
+            string valueString = reader.ReadString();
 
             // Read class-specific data
             int minInt = reader.ReadInt32();
@@ -60,8 +61,11 @@ namespace Celeste.Mod.ARandomizerMod
             int intValue = reader.ReadInt32();
 
             // Deserialize variant
-            IntegerVariant integerVariant = new(name, minInt, maxInt, defaultInt, level);
-            integerVariant.SetValue(intValue);
+            IntegerVariant integerVariant = new(name, minInt, maxInt, defaultInt, level)
+            {
+                valueString = valueString,
+                intValue = intValue
+            };
 
             return integerVariant;
         }
