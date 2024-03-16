@@ -26,7 +26,7 @@ namespace Celeste.Mod.ARandomizerMod
         public enum Level { GREAT, GOOD, NICE, SILLY, DUBIOUS, TAME, NASTY, FUCKED_UP, SUB };
         public Level level;
 
-        public string valueString;
+        public string valueString = "";
 
         public Variant(String name, Level level)
         {
@@ -40,14 +40,19 @@ namespace Celeste.Mod.ARandomizerMod
             cost = costPerLevel[level];
         }
 
+        virtual public void SetValue()
+        {
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented SetValue() method");
+        }
+
         virtual public void Trigger()
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented TriggerVariant() method");
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented Trigger() method");
         }
 
         virtual public void Reset()
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented ResetVariant() method");
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented Reset() method");
         }
     }
 

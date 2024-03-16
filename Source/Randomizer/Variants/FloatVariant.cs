@@ -20,25 +20,23 @@ namespace Celeste.Mod.ARandomizerMod
             this.defaultFloat = defaultFloat;
         }
 
-        public void SetValue(float value)
+        override public void SetValue()
         {
-            floatValue = value;
-            valueString = value.ToString();
+            Random random = new();
+            floatValue = random.NextFloat(maxFloat - minFloat) + minFloat;
+            valueString = floatValue.ToString();
         }
 
-        new public void Trigger()
+        override public void Trigger()
         {
-            if (valueString is null)
-            {
-                Random random = new();
-                SetValue(random.NextFloat(maxFloat - minFloat) + minFloat);
-            }
             ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, floatValue, false);
         }
 
-        new public void Reset()
+        override public void Reset()
         {
-            SetValue(defaultFloat);
+            Logger.Log(LogLevel.Error, "ARandomizerMod", name + " being reset");
+            floatValue = defaultFloat;
+            valueString = defaultFloat.ToString();
             ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, defaultFloat, false);
         }
     }
@@ -51,6 +49,7 @@ namespace Celeste.Mod.ARandomizerMod
             string name = reader.ReadString();
             Variant.Level level = (Variant.Level)reader.ReadInt32();
             string valueString = reader.ReadString();
+            Logger.Log(LogLevel.Error, "ARandomizerMod", valueString);
 
             // Read class-specific data
             float minFloat = reader.ReadSingle();

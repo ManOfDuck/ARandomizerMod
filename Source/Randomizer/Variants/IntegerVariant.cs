@@ -21,27 +21,25 @@ namespace Celeste.Mod.ARandomizerMod
             this.defaultInt = defaultInt;
         }
 
-        public void SetValue(int value)
+        override public void SetValue()
         {
-            intValue = value;
-            valueString = value.ToString();
+            Random random = new();
+            intValue = random.Next(minInt, maxInt);
+            valueString = intValue.ToString();
         }
 
-        new public void Trigger()
+        override public void Trigger()
         {
-            // If we've never set this string, we haven't initilaized this variant yet
-            if (valueString is null)
-            {
-                Random random = new();
-                SetValue(random.Next(minInt, maxInt));
-            }
-            ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, intValue, false);
+
+            ExtendedVariantImports.TriggerIntegerVariant?.Invoke(name, intValue, false);
         }
 
-        new public void Reset()
+        override public void Reset()
         {
-            SetValue(defaultInt);
-            ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, defaultInt, false);
+            intValue = defaultInt;
+            valueString = defaultInt.ToString();
+            ExtendedVariantImports.TriggerIntegerVariant?.Invoke(name, defaultInt, false);
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "resset");
         }
     }
 

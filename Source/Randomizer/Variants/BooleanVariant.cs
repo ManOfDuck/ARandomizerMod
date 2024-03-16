@@ -28,15 +28,19 @@ namespace Celeste.Mod.ARandomizerMod
             }
         }
 
-        new public void Trigger()
+        override public void SetValue()
         {
             valueString = status.ToString();
+        }
+
+        override public void Trigger()
+        {
             ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, status, false);
             foreach (Variant subVariant in subVariants)
                 subVariant.Trigger();
         }
 
-        new public void Reset()
+        override public void Reset()
         {
             valueString = (!status).ToString();
             ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, !status, false);
@@ -55,7 +59,7 @@ namespace Celeste.Mod.ARandomizerMod
             string valueString = reader.ReadString();
 
             // Read class-specific data
-            Boolean status = reader.ReadBoolean();
+            bool status = reader.ReadBoolean();
 
             // Read length of sub-variant array
             int numSubVariants = reader.ReadInt32();
@@ -81,7 +85,6 @@ namespace Celeste.Mod.ARandomizerMod
             VariantExt.WriteVariantBase(writer, booleanVariant);
 
             // Write class-specific data
-            writer.Write((Variant)booleanVariant);
             writer.Write(booleanVariant.status);
 
             // Get length of sub-variant array

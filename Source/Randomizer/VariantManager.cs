@@ -34,7 +34,7 @@ namespace Celeste.Mod.ARandomizerMod
                 // Update this room for all clients
                 foreach (Variant variant in activeVariants)
                 {
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Sending variant " + variant.name + " with value " + variant.valueString);
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "sending variant " + variant.name + " with value " + variant.valueString);
                     CNetComm.Instance.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
                 }
             }
@@ -117,6 +117,7 @@ namespace Celeste.Mod.ARandomizerMod
 
             foreach (Variant variant in variantsToAdd )
             {
+                variant.SetValue();
                 TriggerVariant(variant);
             }
 
