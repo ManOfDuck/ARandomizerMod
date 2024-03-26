@@ -42,7 +42,6 @@ namespace Celeste.Mod.ARandomizerMod
 
         override public void Reset()
         {
-            valueString = (!status).ToString();
             ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, !status, false);
             foreach (Variant subVariant in subVariants)
                 subVariant.Reset();
