@@ -20,10 +20,10 @@ namespace Celeste.Mod.ARandomizerMod
         public void RoomLoaded(LevelData room)
         {
             currentRoom = room;
-            Logger.Log(LogLevel.Error, "ARandomizerMod", room.Name);
 
             if (variantsByRoomName.ContainsKey(room.Name))
             {
+                Logger.Log(LogLevel.Error, "ARandomizerMod", "Room id in list alread");
                 MatchVariantList(variantsByRoomName[room.Name]);
             }
             else
@@ -74,21 +74,24 @@ namespace Celeste.Mod.ARandomizerMod
                 switch (operation)
                 {
                     case VariantUpdateData.Operation.ADD:
-                        Logger.Log(LogLevel.Error, "ARandomizerMod", "Adding variant");
                         variantsByRoomName[roomName].AddLast(variant);
+                        // If we're in this room, trigger this variant
+                        if (currentRoom?.Name.Equals(roomName) == true)
+                        {
+                            TriggerVariant(variant);
+                        }
                         break;
                     case VariantUpdateData.Operation.REMOVE:
                         variantsByRoomName[roomName].Remove(variant);
+                        // If we're in this room, reset this variant
+                        if (currentRoom?.Name.Equals(roomName) == true)
+                        {
+                            ResetVariant(variant);
+                        }
                         break;
                     default:
                         Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Operation");
                         break;
-                }
-
-                // If we're in this room, update our variants
-                if (currentRoom?.Name.Equals(roomName) == true)
-                {
-                    MatchVariantList(variantsByRoomName[roomName]);
                 }
             }
         }
@@ -123,27 +126,25 @@ namespace Celeste.Mod.ARandomizerMod
 
             for (int i = 0; i < numVariantsToRemove; i++)
             {
-                ResetRandomVariant();
+                //ResetRandomVariant();
             }
         }
 
         private void MatchVariantList(LinkedList<Variant> targetList)
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "matching");
-            foreach (Variant variant in activeVariants.ToArray()) // Convert to array to avoid concurrent modification exceptions
-            {
-                if (!targetList.Contains(variant))
-                {
-                    ResetVariant(variant);
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "reset");
-                }
-            }
             foreach (Variant variant in targetList)
             {
                 if (!activeVariants.Contains(variant))
                 {
                     TriggerVariant(variant);
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "add");
+                }
+            }
+            foreach (Variant variant in activeVariants.ToArray()) // Convert to array to avoid concurrent modification exceptions
+            {
+                if (!targetList.Contains(variant))
+                {
+                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Resetting during match");
+                    ResetVariant(variant);
                 }
             }
         }
@@ -180,12 +181,12 @@ namespace Celeste.Mod.ARandomizerMod
 
         public void ResetVariant(Variant variant)
         {
-            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Resetting variant " + variant.name + "...");
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Resetting variant " + variant.name + "...");
 
             variant.Reset();
             activeVariants.Remove(variant);
 
-            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Reset variant " + variant.name + " to value " + variant.valueString);
+            Logger.Log(LogLevel.Error, "ARandomizerMod", "Reset variant " + variant.name + " to value " + variant.valueString);
         }
 
         public void ResetRandomVariant()

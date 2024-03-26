@@ -78,7 +78,6 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
 
         public void Handle(CelesteNetConnection con, VariantUpdateData data)
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Invoking event");
             updateQueue.Enqueue(() => OnReceiveVariantUpdate?.Invoke(data));
         }
         #endregion
@@ -136,7 +135,6 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
 
         public void SendVariantUpdate(string roomName, Variant variant, VariantUpdateData.Operation operation)
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Sending Update");
             VariantUpdateData data = new()
             {
                 roomName = roomName,

@@ -107,7 +107,6 @@ namespace Celeste.Mod.ARandomizerMod {
 
         private void OnVariantUpdate(VariantUpdateData data)
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "event received");
             variantManager?.ProcessVariantUpdate(data);
         }
 

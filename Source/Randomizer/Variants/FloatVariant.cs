@@ -49,7 +49,6 @@ namespace Celeste.Mod.ARandomizerMod
             string name = reader.ReadString();
             Variant.Level level = (Variant.Level)reader.ReadInt32();
             string valueString = reader.ReadString();
-            Logger.Log(LogLevel.Error, "ARandomizerMod", valueString);
 
             // Read class-specific data
             float minFloat = reader.ReadSingle();

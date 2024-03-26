@@ -44,8 +44,8 @@ namespace Celeste.Mod.ARandomizerMod
         {
             valueString = (!status).ToString();
             ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, !status, false);
-            foreach (Variant subVariant in subVariants)
-                subVariant.Reset();
+            //foreach (Variant subVariant in subVariants)
+                //subVariant.Reset();
         }
     }
 
