@@ -34,9 +34,6 @@ namespace Celeste.Mod.ARandomizerMod
 
         override public void Reset()
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", name + " being reset");
-            floatValue = defaultFloat;
-            valueString = defaultFloat.ToString();
             ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, defaultFloat, false);
         }
     }

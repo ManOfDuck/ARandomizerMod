@@ -30,14 +30,11 @@ namespace Celeste.Mod.ARandomizerMod
 
         override public void Trigger()
         {
-
             ExtendedVariantImports.TriggerIntegerVariant?.Invoke(name, intValue, false);
         }
 
         override public void Reset()
         {
-            intValue = defaultInt;
-            valueString = defaultInt.ToString();
             ExtendedVariantImports.TriggerIntegerVariant?.Invoke(name, defaultInt, false);
         }
     }

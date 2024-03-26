@@ -23,7 +23,6 @@ namespace Celeste.Mod.ARandomizerMod
 
             if (variantsByRoomName.ContainsKey(room.Name))
             {
-                Logger.Log(LogLevel.Error, "ARandomizerMod", "Room id in list alread");
                 MatchVariantList(variantsByRoomName[room.Name]);
             }
             else
