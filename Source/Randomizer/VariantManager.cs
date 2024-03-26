@@ -54,16 +54,16 @@ namespace Celeste.Mod.ARandomizerMod
                 {
                     case VariantUpdateData.Operation.ADD:
                         AddVariantToAllRooms(variant);
+                        TriggerVariant(variant);
                         break;
                     case VariantUpdateData.Operation.REMOVE:
                         RemoveVariantFromAllRooms(variant);
+                        ResetVariant(variant);
                         break;
                     default:
                         Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Operation");
                         break;
                 }
-
-                MatchVariantList(variantsByRoomName[currentRoom.Name]);
             }
             else if (roomName is not null)
             {
