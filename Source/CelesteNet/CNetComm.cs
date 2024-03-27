@@ -8,6 +8,7 @@ using Celeste.Mod.CelesteNet.Client;
 using Celeste.Mod.CelesteNet.Client.Components;
 using Celeste.Mod.ARandomizerMod.Data;
 using System.Collections.Concurrent;
+using Celeste.Mod.ARandomizerMod.CelesteNet.Data;
 
 namespace Celeste.Mod.ARandomizerMod.CelesteNet
 {
@@ -63,6 +64,9 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
         public delegate void OnReceiveTestHandler(TestData data);
         public static event OnReceiveTestHandler OnReceiveTest;
 
+        public delegate void OnReceiveVariantUpdateHandler(VariantUpdateData data);
+        public static event OnReceiveVariantUpdateHandler OnReceiveVariantUpdate;
+
         #endregion
 
         #region handlers
@@ -70,6 +74,11 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
         {
             data.player ??= CnetClient?.PlayerInfo;  // It's null when handling our own messages, set it to our current player if connected
             updateQueue.Enqueue(() => OnReceiveTest?.Invoke(data));
+        }
+
+        public void Handle(CelesteNetConnection con, VariantUpdateData data)
+        {
+            updateQueue.Enqueue(() => OnReceiveVariantUpdate?.Invoke(data));
         }
         #endregion
 
@@ -82,7 +91,6 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
             Instance = this;
             CelesteNetClientContext.OnStart += OnCNetClientContextStart;
             Disposed += OnComponentDisposed;
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Ctr called");
         }
 
         private void OnCNetClientContextStart(CelesteNetClientContext cxt)
@@ -122,6 +130,21 @@ namespace Celeste.Mod.ARandomizerMod.CelesteNet
                 // if in singleplayer, skip sending the message to the server
                 Handle(null, data);
             else 
+                CnetClient.SendAndHandle(data);
+        }
+
+        public void SendVariantUpdate(string roomName, Variant variant, VariantUpdateData.Operation operation)
+        {
+            VariantUpdateData data = new()
+            {
+                roomName = roomName,
+                variant = variant,
+                operation = operation
+            };
+
+            if (!CanSendMessages)
+                Handle(null, data);
+            else
                 CnetClient.SendAndHandle(data);
         }
     }

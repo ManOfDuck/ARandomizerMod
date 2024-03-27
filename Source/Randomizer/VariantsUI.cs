@@ -169,7 +169,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
             int offset = (variant.level == Variant.Level.SUB) ? subVariantOffset : 0;
             offset += (selectedNode is not null) ? costOffset : textOffset;
-            string text = variant.name + ": " + variant.value;
+            string text = variant.name + ": " + variant.valueString;
             
             RenderText(text, color, line, offset);
         }
@@ -255,10 +255,10 @@ namespace Celeste.Mod.ARandomizerMod
         {
             controlsDisabled = false;
 
-            int jumpCount = Int32.Parse(variantManager.GetVariantWithName("JumpCount")?.value ?? "1");
-            int dashRestriction = Int32.Parse(variantManager.GetVariantWithName("DashRestriction")?.value ?? "0");
-            bool disableWallJumping = Boolean.Parse(variantManager.GetVariantWithName("DisableWallJumping")?.value ?? "False");
-            bool noGrabbing = Boolean.Parse(variantManager.GetVariantWithName("NoGrabbing")?.value ?? "False");
+            int jumpCount = Int32.Parse(variantManager.GetVariantWithName("JumpCount")?.valueString ?? "1");
+            int dashRestriction = Int32.Parse(variantManager.GetVariantWithName("DashRestriction")?.valueString ?? "0");
+            bool disableWallJumping = Boolean.Parse(variantManager.GetVariantWithName("DisableWallJumping")?.valueString ?? "False");
+            bool noGrabbing = Boolean.Parse(variantManager.GetVariantWithName("NoGrabbing")?.valueString ?? "False");
 
             ExtendedVariantImports.TriggerIntegerVariant?.Invoke("JumpCount", jumpCount, false);
             ExtendedVariantImports.TriggerIntegerVariant?.Invoke("DashRestriction", dashRestriction, false);

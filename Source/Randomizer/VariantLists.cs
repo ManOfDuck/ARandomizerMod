@@ -2,7 +2,7 @@
 
 namespace Celeste.Mod.ARandomizerMod
 {
-	public class VariantLists
+	public static class VariantLists
 	{
 		public static readonly Variant[] great = {
 			//Gravity
