@@ -4,7 +4,7 @@ using Keys = Microsoft.Xna.Framework.Input.Keys;
 namespace Celeste.Mod.ARandomizerMod {
     public class ARandomizerModModuleSettings : EverestModuleSettings {
 
-        [DefaultButtonBinding(Buttons.LeftShoulder, Keys.Tab)]
+        [DefaultButtonBinding(Buttons.LeftShoulder, Keys.V)]
         public ButtonBinding OpenVariantsMenu { get; set; }
 
         [DefaultButtonBinding(Buttons.LeftThumbstickUp, Keys.Up)]

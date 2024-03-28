@@ -1,4 +1,5 @@
-﻿using Monocle;
+﻿using Celeste.Mod.ARandomizerMod.CelesteNet;
+using Monocle;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,30 +14,33 @@ namespace Celeste.Mod.ARandomizerMod
         readonly VariantManager variantManager;
 
         public int money = 0;
-        readonly int moneyGainedPerRoom = 100;
-        readonly int strawberryMoney = 300;
+        readonly int moneyGainedPerRoom = 50;
+        readonly int strawberryMoney = 150;
         readonly int cassetteMoney = 500;
         readonly int heartMoney = 1000;
-        readonly float variantCostToGainRatio = 0.01f;
+        readonly float variantCostToGainRatio = 0f;
 
         public int score = 0;
         readonly int scoreGainedPerRoom = 100;
         readonly int strawberryScore = 1000;
         readonly int cassetteScore = 50000;
         readonly int heartScore = 10000;
-        readonly float variantCostToScoreRatio = 0.5f;
+        readonly float variantCostToScoreRatio = 0.1f;
 
         public EconomyManager(VariantManager variantManager)
         {
             On.Celeste.StrawberryPoints.Added += StrawberryCollected;
             On.Celeste.HeartGem.Collect += HeartCollected;
-            On.Celeste.Cassette.CollectRoutine += CassetteCollected;
+            On.Celeste.Cassette.OnPlayer += CassetteCollected;
             this.variantManager = variantManager;
         }
 
-        private IEnumerator CassetteCollected(On.Celeste.Cassette.orig_CollectRoutine orig, Cassette self, Player player)
+        private void CassetteCollected(On.Celeste.Cassette.orig_OnPlayer orig, Cassette self, Player player)
         {
-            throw new NotImplementedException();
+            money += cassetteMoney;
+            score += cassetteScore;
+
+            orig(self, player);
         }
 
         private void StrawberryCollected(On.Celeste.StrawberryPoints.orig_Added orig, StrawberryPoints self, Scene scene)
@@ -68,7 +72,7 @@ namespace Celeste.Mod.ARandomizerMod
         public void PurchaseVariantRemoval(Variant variant)
         {
             money -= variant.cost;
-            variantManager.ResetVariant(variant);
+            CNetComm.Instance.SendVariantUpdate(VariantManager.AllRoomsIdentifier, variant, CelesteNet.Data.VariantUpdateData.Operation.REMOVE);
         }
     }
 }
