@@ -33,7 +33,7 @@ namespace Celeste.Mod.ARandomizerMod
                 // Update this room for all clients
                 foreach (Variant variant in activeVariants)
                 {
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "sending variant " + variant.name + " with value " + variant.valueString);
+                    Logger.Log(LogLevel.Debug, "ARandomizerMod", "sending variant " + variant.name + " with value " + variant.valueString);
                     CNetComm.Instance.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
                 }
             }
@@ -44,7 +44,7 @@ namespace Celeste.Mod.ARandomizerMod
             string roomName = data.roomName;
             Variant variant = data.variant;
             VariantUpdateData.Operation operation = data.operation;
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Received variant " + variant.name + " with value " + variant.valueString);
+            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Received variant " + variant.name + " with value " + variant.valueString);
 
             if (roomName.Equals(AllRoomsIdentifier))
             {
@@ -60,7 +60,7 @@ namespace Celeste.Mod.ARandomizerMod
                         ResetVariant(variant);
                         break;
                     default:
-                        Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Operation");
+                        Logger.Log(LogLevel.Debug, "ARandomizerMod", "Unrecognized Variant Operation");
                         break;
                 }
             }
@@ -89,7 +89,7 @@ namespace Celeste.Mod.ARandomizerMod
                         }
                         break;
                     default:
-                        Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Operation");
+                        Logger.Log(LogLevel.Debug, "ARandomizerMod", "Unrecognized Variant Operation");
                         break;
                 }
             }
@@ -142,7 +142,7 @@ namespace Celeste.Mod.ARandomizerMod
             {
                 if (!targetList.Contains(variant))
                 {
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Resetting during match");
+                    Logger.Log(LogLevel.Debug, "ARandomizerMod", "Resetting during match");
                     ResetVariant(variant);
                 }
             }
@@ -180,12 +180,12 @@ namespace Celeste.Mod.ARandomizerMod
 
         public void ResetVariant(Variant variant)
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Resetting variant " + variant.name + "...");
+            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Resetting variant " + variant.name + "...");
 
             variant.Reset();
             activeVariants.Remove(variant);
 
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Reset variant " + variant.name + " to value " + variant.valueString);
+            Logger.Log(LogLevel.Debug, "ARandomizerMod", "Reset variant " + variant.name + " to value " + variant.valueString);
         }
 
         public void ResetRandomVariant()

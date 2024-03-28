@@ -27,13 +27,13 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             Instance = this;
 
-//#if DEBUG   
+#if DEBUG   
             // debug builds use verbose logging
             Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Debug);
-//#else
+#else
             // release builds use info logging to reduce spam in log files
-            //Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Info);
-//#endif
+            Logger.SetLogLevel(nameof(ARandomizerModModule), LogLevel.Info);
+#endif
         }
 
         public override void Load() {
@@ -57,7 +57,7 @@ namespace Celeste.Mod.ARandomizerMod {
 
         private void OnReceiveTest(TestData data)
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", data.Message);
+            Logger.Log(LogLevel.Debug, "ARandomizerMod", data.Message);
         }
 
         public override void Unload()

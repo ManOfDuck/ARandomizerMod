@@ -53,7 +53,7 @@ namespace Celeste.Mod.ARandomizerMod
             int maxInt = reader.ReadInt32();
             int defaultInt = reader.ReadInt32();
             int intValue = reader.ReadInt32();
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Reading Int variant: name = " + name + " level = " + level + " valueString = " + valueString + " min = " + minInt + " max = " + maxInt + " default = " + defaultInt + " value = " + intValue);
+           
 
             // Deserialize variant
             IntegerVariant integerVariant = new(name, minInt, maxInt, defaultInt, level)
