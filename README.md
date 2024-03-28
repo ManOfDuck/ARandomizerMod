@@ -7,6 +7,7 @@ A Randomizer Mod adds:
 - An economy system, allowing players to work to remove difficult variants
 - Online Co-op!
   -   Join or create a channel with /join <ChannelName> on CelesteNet to play in co-op
+  -   Make sure you're all in the channel before you start playing, anyone joining late will be desynced
 
 Installation:
 - Purchase Celeste (https://store.steampowered.com/app/504230/Celeste/)
