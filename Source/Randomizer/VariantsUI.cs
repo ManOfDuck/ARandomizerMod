@@ -13,11 +13,8 @@ namespace Celeste.Mod.ARandomizerMod
 	public class VaraintsUI : Entity
 	{
         public bool render = false;
-        public bool controlsDisabled = false;
+        public static bool controlsDisabled = false;
         public LinkedListNode<Variant> selectedNode;
-
-        readonly VariantManager variantManager;
-        readonly EconomyManager economyManager;
 
         readonly int topHeight = 250;
         readonly int width = 730;
@@ -61,17 +58,14 @@ namespace Celeste.Mod.ARandomizerMod
         readonly Color selectionColor = Color.LightGreen;
         readonly Color cantAffordSelectionColor = Color.LightGray;
 
-        public VaraintsUI(VariantManager variantManager, EconomyManager economyManager)
+        public VaraintsUI()
         {
-            this.variantManager = variantManager;
-            this.economyManager = economyManager;
-
-            AddTag(Tags.HUD);
+            base.Tag = Tags.HUD | Tags.Global;
 
             On.Monocle.Binding.Pressed += Pressed;
         }
 
-        private bool Pressed(On.Monocle.Binding.orig_Pressed orig, Binding self, int gamepadIndex, float threshold)
+        private static bool Pressed(On.Monocle.Binding.orig_Pressed orig, Binding self, int gamepadIndex, float threshold)
         {
             if (controlsDisabled)
             {
@@ -102,7 +96,7 @@ namespace Celeste.Mod.ARandomizerMod
                 RenderMoneySmall();
             }
 
-            if (variantManager.activeVariants.Count < 1)
+            if (VariantManager.activeVariants.Count < 1)
             {
                 RenderText("No Active Variants", textColor, 0, 0);
             }
@@ -115,7 +109,7 @@ namespace Celeste.Mod.ARandomizerMod
         private void RenderBackground()
         {
             int moneySpace = (selectedNode is not null) ? moneyHeight : smallMoneyHeight;
-            int height = Math.Max(minLines * lineHeight, (lineHeight * variantManager.activeVariants.Count) + (verticalPadding * 2)) + moneySpace;
+            int height = Math.Max(minLines * lineHeight, (lineHeight * VariantManager.activeVariants.Count) + (verticalPadding * 2)) + moneySpace;
             Draw.Rect(new Vector2(offset, topHeight - moneySpace), width, height, color);
         }
 
@@ -124,27 +118,27 @@ namespace Celeste.Mod.ARandomizerMod
             float xPos = offset + textOffset + scoreOffset;
             int moneySpace = (selectedNode is not null) ? moneyHeight : smallMoneyHeight;
             float yPos = topHeight - moneySpace + scorePadding;
-            ActiveFont.Draw("Score: " + economyManager.score, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(scoreScale, scoreScale), scoreColor);
+            ActiveFont.Draw("Score: " + EconomyManager.score, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(scoreScale, scoreScale), scoreColor);
         }
 
         private void RenderMoneyBig()
         {
             float xPos = offset + textOffset + moneyOffset;
             float yPos = topHeight - moneyHeight + moneyPadding;
-            ActiveFont.Draw("$" + economyManager.money, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(moneyScale, moneyScale), moneyColor);
+            ActiveFont.Draw("$" + EconomyManager.money, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(moneyScale, moneyScale), moneyColor);
         }
 
         private void RenderMoneySmall()
         {
             float xPos = offset + textOffset + smallMoneyOffset;
             float yPos = topHeight - smallMoneyHeight + smallMoneyPadding;
-            ActiveFont.Draw("$" + economyManager.money, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(smallMoneyScale, smallMoneyScale), smallMoneyColor);
+            ActiveFont.Draw("$" + EconomyManager.money, new Vector2(xPos, yPos), Vector2.Zero, new Vector2(smallMoneyScale, smallMoneyScale), smallMoneyColor);
         }
 
         private void RenderActiveVariants()
         {
-            LinkedListNode<Variant> node = variantManager.activeVariants.First;
-            for (int line = 0; line < variantManager.activeVariants.Count; line++)
+            LinkedListNode<Variant> node = VariantManager.activeVariants.First;
+            for (int line = 0; line < VariantManager.activeVariants.Count; line++)
             {
                 if (node == null) break; // for safety, should never happen
                 RenderVariant(node.Value, line);
@@ -161,7 +155,7 @@ namespace Celeste.Mod.ARandomizerMod
             Color color;
             if (selectedNode is not null && selectedNode.Value.name == variant.name)
             {
-                color = (variant.cost <= economyManager.money) ? selectionColor : cantAffordSelectionColor;
+                color = (variant.cost <= EconomyManager.money) ? selectionColor : cantAffordSelectionColor;
             }
             else
             {
@@ -181,7 +175,7 @@ namespace Celeste.Mod.ARandomizerMod
             {
                 color = (selectedNode.Value.name.Equals(variant.name)) ? sellColor : sellSelectedColor;
             }
-            else if (variant.cost <= economyManager.money)
+            else if (variant.cost <= EconomyManager.money)
             {
                 color = (selectedNode.Value.name.Equals(variant.name)) ? canAffordSelectedColor : canAffordColor;
             }
@@ -222,7 +216,7 @@ namespace Celeste.Mod.ARandomizerMod
                 Input.MoveX.Value = 0;
                 Input.MoveY.Value = 0;
             }
-            if (render && variantManager.activeVariants.Count > 0)
+            if (render && VariantManager.activeVariants.Count > 0)
             {
                 NavigateUI();
             }
@@ -255,10 +249,10 @@ namespace Celeste.Mod.ARandomizerMod
         {
             controlsDisabled = false;
 
-            int jumpCount = Int32.Parse(variantManager.GetVariantWithName("JumpCount")?.valueString ?? "1");
-            int dashRestriction = Int32.Parse(variantManager.GetVariantWithName("DashRestriction")?.valueString ?? "0");
-            bool disableWallJumping = Boolean.Parse(variantManager.GetVariantWithName("DisableWallJumping")?.valueString ?? "False");
-            bool noGrabbing = Boolean.Parse(variantManager.GetVariantWithName("NoGrabbing")?.valueString ?? "False");
+            int jumpCount = Int32.Parse(VariantManager.GetVariantWithName("JumpCount")?.valueString ?? "1");
+            int dashRestriction = Int32.Parse(VariantManager.GetVariantWithName("DashRestriction")?.valueString ?? "0");
+            bool disableWallJumping = Boolean.Parse(VariantManager.GetVariantWithName("DisableWallJumping")?.valueString ?? "False");
+            bool noGrabbing = Boolean.Parse(VariantManager.GetVariantWithName("NoGrabbing")?.valueString ?? "False");
 
             ExtendedVariantImports.TriggerIntegerVariant?.Invoke("JumpCount", jumpCount, false);
             ExtendedVariantImports.TriggerIntegerVariant?.Invoke("DashRestriction", dashRestriction, false);
@@ -283,9 +277,9 @@ namespace Celeste.Mod.ARandomizerMod
             if (ARandomizerModModule.Settings.Select.Pressed && selectedNode != null && selectedNode.Value != null)
             {
                 ARandomizerModModule.Settings.Select.ConsumePress();
-                if (selectedNode.Value.cost <= economyManager.money)
+                if (selectedNode.Value.cost <= EconomyManager.money)
                 {
-                    economyManager.PurchaseVariantRemoval(selectedNode.Value);
+                    EconomyManager.PurchaseVariantRemoval(selectedNode.Value);
                     NavigateDown();
                 }
             }
@@ -295,7 +289,7 @@ namespace Celeste.Mod.ARandomizerMod
         {
             if (selectedNode == null)
             {
-                selectedNode = variantManager.activeVariants.Last;
+                selectedNode = VariantManager.activeVariants.Last;
             }
             else if (selectedNode.Previous != null)
             {
@@ -303,7 +297,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
             else
             {
-                selectedNode = variantManager.activeVariants.Last;
+                selectedNode = VariantManager.activeVariants.Last;
             }
         }
 
@@ -311,7 +305,7 @@ namespace Celeste.Mod.ARandomizerMod
         {
             if (selectedNode == null)
             {
-                selectedNode = variantManager.activeVariants.First;
+                selectedNode = VariantManager.activeVariants.First;
             }
             else if (selectedNode.Next != null)
             {
@@ -319,7 +313,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
             else
             {
-                selectedNode = variantManager.activeVariants.First;
+                selectedNode = VariantManager.activeVariants.First;
             }
         }
         #endregion

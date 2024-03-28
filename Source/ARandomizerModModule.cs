@@ -12,16 +12,14 @@ using Lists = Celeste.Mod.ARandomizerMod.VariantLists;
 
 namespace Celeste.Mod.ARandomizerMod {
     public class ARandomizerModModule : EverestModule {
-        public static readonly string ProtocolVersion = "1_0_0";
+        public static readonly string ProtocolVersion = "1_0_2";
 
         public static ARandomizerModModule Instance { get; private set; }
 
         public override Type SettingsType => typeof(ARandomizerModModuleSettings);
         public static ARandomizerModModuleSettings Settings => (ARandomizerModModuleSettings)Instance._Settings;
 
-        public VaraintsUI ui;
-        public VariantManager variantManager;
-        public EconomyManager economyManager;
+        private static VaraintsUI ui;
 
         public ARandomizerModModule()
         {
@@ -39,13 +37,15 @@ namespace Celeste.Mod.ARandomizerMod {
         public override void Load() {
             typeof(ExtendedVariantImports).ModInterop();
 
-            variantManager = new();
-            economyManager = new(variantManager);
+            //Everest Events
+            Everest.Events.LevelLoader.OnLoadingThread += OnLoadingThread;
 
             // Celeste Hooks
-            On.Celeste.Level.LoadLevel += LevelLoad;
             On.Celeste.Level.TransitionRoutine += RoomTransition;
             On.Celeste.LevelLoader.StartLevel += LevelStarted;
+            On.Celeste.StrawberryPoints.Added += StrawberryCollected;
+            On.Celeste.HeartGem.Collect += HeartCollected;
+            On.Celeste.Cassette.CollectRoutine += CassetteCollected;
 
             // Multiplayer Events
             CNetComm.OnReceiveVariantUpdate += OnVariantUpdate;
@@ -55,59 +55,74 @@ namespace Celeste.Mod.ARandomizerMod {
             Celeste.Instance.Components.Add(new CNetComm(Celeste.Instance));
         }
 
-        private void OnReceiveTest(TestData data)
-        {
-            Logger.Log(LogLevel.Info, "ARandomizerMod", data.Message);
-        }
-
         public override void Unload()
         {
-            On.Celeste.Level.LoadLevel -= LevelLoad;
             On.Celeste.Level.TransitionRoutine -= RoomTransition;
             On.Celeste.LevelLoader.StartLevel -= LevelStarted;
+            On.Celeste.StrawberryPoints.Added -= StrawberryCollected;
+            On.Celeste.HeartGem.Collect -= HeartCollected;
+            On.Celeste.Cassette.CollectRoutine -= CassetteCollected;
+
+            CNetComm.OnReceiveVariantUpdate -= OnVariantUpdate;
+            CNetComm.OnReceiveTest -= OnReceiveTest;
 
             if (Celeste.Instance.Components.Contains(CNetComm.Instance))
                 Celeste.Instance.Components.Remove(CNetComm.Instance);
         }
 
+        private static void OnReceiveTest(TestData data)
+        {
+            Logger.Log(LogLevel.Info, "ARandomizerMod", data.Message);
+        }
+
+        private void OnLoadingThread(Level level)
+        {
+            ui ??= new VaraintsUI()
+            {
+                Active = true
+            };
+            level.Add(ui);
+        }
+
         // TODO: this is activated on debug teleport too, maybe something to fix?
-        private void LevelStarted(On.Celeste.LevelLoader.orig_StartLevel orig, LevelLoader self)
+        private static void LevelStarted(On.Celeste.LevelLoader.orig_StartLevel orig, LevelLoader self)
         {
             orig(self);
-            variantManager.ResetAllVariants();
+            VariantManager.ResetAllVariants();
         }
 
-        private void LevelLoad(On.Celeste.Level.orig_LoadLevel orig, Level self, Player.IntroTypes playerIntro, bool isFromLoader)
+        private static IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
         {
-            orig(self, playerIntro, isFromLoader);
+            EconomyManager.RoomCleared();
+            VariantManager.RoomLoaded(next);
 
-            ui??= new VaraintsUI(variantManager, economyManager)
-            {
-                Active = true
-            };
-            self.Add(ui);
+            yield return new SwapImmediately(orig(self, next, direction));
         }
 
-        private IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)
+        private static void StrawberryCollected(On.Celeste.StrawberryPoints.orig_Added orig, StrawberryPoints self, Scene scene)
         {
-            economyManager.RoomCleared();
-            variantManager.RoomLoaded(next);
+            EconomyManager.StrawberryCollected();
 
-            CNetComm.Instance.SendTestMessage("hello grilfriend");
-
-            self.Remove(ui);
-            ui = new VaraintsUI(variantManager, economyManager)
-            {
-                Active = true
-            };
-            self.Add(ui);
-
-            return orig(self, next, direction);
+            orig(self, scene);
         }
 
-        private void OnVariantUpdate(VariantUpdateData data)
+        private static void HeartCollected(On.Celeste.HeartGem.orig_Collect orig, HeartGem self, Player player)
         {
-            variantManager?.ProcessVariantUpdate(data);
+            EconomyManager.HeartCollected();
+
+            orig(self, player);
+        }
+
+        private static IEnumerator CassetteCollected(On.Celeste.Cassette.orig_CollectRoutine orig, Cassette self, Player player)
+        {
+            EconomyManager.CassetteCollected();
+
+            yield return new SwapImmediately(orig(self, player));
+        }
+
+        private static void OnVariantUpdate(VariantUpdateData data)
+        {
+            VariantManager.ProcessVariantUpdate(data);
         }
 
         private void TestAllVariants()
@@ -122,12 +137,12 @@ namespace Celeste.Mod.ARandomizerMod {
             TestVariantList(VariantLists.great);
         }
 
-        private void TestVariantList(Variant[] list)
+        private static void TestVariantList(Variant[] list)
         {
             foreach (Variant v in list)
             {
                 Logger.Log(LogLevel.Warn, "ARandomizerMod", v.name);
-                variantManager.TriggerVariant(v);
+                VariantManager.TriggerVariant(v);
             }
         }
     }

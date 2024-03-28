@@ -1,5 +1,5 @@
 - Name: ARandomizerMod
-  Version: 1.0.1
+  Version: 1.0.2
   DLL: bin/ARandomizerMod.dll
   Dependencies:
     - Name: EverestCore

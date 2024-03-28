@@ -9,67 +9,51 @@ using System.Threading.Tasks;
 
 namespace Celeste.Mod.ARandomizerMod
 {
-    public class EconomyManager
+    public static class EconomyManager
     {
-        readonly VariantManager variantManager;
+        public static int money = 0;
+        readonly static int moneyGainedPerRoom = 50;
+        readonly static int strawberryMoney = 150;
+        readonly static int cassetteMoney = 500;
+        readonly static int heartMoney = 1000;
+        readonly static float variantCostToGainRatio = 0f;
 
-        public int money = 0;
-        readonly int moneyGainedPerRoom = 50;
-        readonly int strawberryMoney = 150;
-        readonly int cassetteMoney = 500;
-        readonly int heartMoney = 1000;
-        readonly float variantCostToGainRatio = 0f;
+        public static int score = 0;
+        readonly static int scoreGainedPerRoom = 100;
+        readonly static int strawberryScore = 1000;
+        readonly static int cassetteScore = 50000;
+        readonly static int heartScore = 10000;
+        readonly static float variantCostToScoreRatio = 0.1f;
 
-        public int score = 0;
-        readonly int scoreGainedPerRoom = 100;
-        readonly int strawberryScore = 1000;
-        readonly int cassetteScore = 50000;
-        readonly int heartScore = 10000;
-        readonly float variantCostToScoreRatio = 0.1f;
-
-        public EconomyManager(VariantManager variantManager)
-        {
-            On.Celeste.StrawberryPoints.Added += StrawberryCollected;
-            On.Celeste.HeartGem.Collect += HeartCollected;
-            On.Celeste.Cassette.OnPlayer += CassetteCollected;
-            this.variantManager = variantManager;
-        }
-
-        private void CassetteCollected(On.Celeste.Cassette.orig_OnPlayer orig, Cassette self, Player player)
+        public static void CassetteCollected()
         {
             money += cassetteMoney;
             score += cassetteScore;
-
-            orig(self, player);
         }
 
-        private void StrawberryCollected(On.Celeste.StrawberryPoints.orig_Added orig, StrawberryPoints self, Scene scene)
+        public static void StrawberryCollected()
         {
             money += strawberryMoney;
             score += strawberryScore;
-
-            orig(self, scene);
         }
-        private void HeartCollected(On.Celeste.HeartGem.orig_Collect orig, HeartGem self, Player player)
+        public static void HeartCollected()
         {
             money += heartMoney;
             score += heartScore;
-
-            orig(self, player);
         }
 
-        public void RoomCleared()
+        public static void RoomCleared()
         {
             money += moneyGainedPerRoom;
             score += scoreGainedPerRoom;
-            foreach (Variant variant in variantManager.activeVariants)
+            foreach (Variant variant in VariantManager.activeVariants)
             {
                 money += (int)(variant.cost * variantCostToGainRatio);
                 score += (int)(variant.cost * variantCostToScoreRatio);
             }
         }
 
-        public void PurchaseVariantRemoval(Variant variant)
+        public static void PurchaseVariantRemoval(Variant variant)
         {
             money -= variant.cost;
             CNetComm.Instance.SendVariantUpdate(VariantManager.AllRoomsIdentifier, variant, CelesteNet.Data.VariantUpdateData.Operation.REMOVE);
