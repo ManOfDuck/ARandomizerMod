@@ -8,14 +8,14 @@ namespace Celeste.Mod.ARandomizerMod
 			//Gravity
 			//FallSpeed
 			//JumpHeight
-            new FloatVariant("JumpDuration", 3.0f, 100f, 1f, Variant.Level.GREAT),
+            new FloatVariant("JumpDuration", 3.0f, 10f, 1f, Variant.Level.GREAT),
 			//WallBouncingSpeed
 			//DisableWallJumping
 
 			new IntegerVariant("JumpCount", int.MaxValue, int.MaxValue, 1, Variant.Level.GREAT),
 			new IntegerVariant("DashCount", 5, 5, -1, Variant.Level.GREAT),
 			new BooleanVariant("HeldDash", true, Variant.Level.GREAT),
-
+			new BooleanVariant("SuperDashing", true, Variant.Level.GREAT),
         };
 
 		public static readonly Variant[] good = {
@@ -37,6 +37,8 @@ namespace Celeste.Mod.ARandomizerMod
 
 			new IntegerVariant("Stamina", 230, 500, 110, Variant.Level.GOOD),
 			new IntegerVariant("JellyfishEverywhere", 1, 1, 0, Variant.Level.GOOD),
+			new BooleanVariant("DashAssist", true, Variant.Level.GOOD),
+			new BooleanVariant("AlwaysFeather", true, Variant.Level.GOOD),
         };
 
 		public static readonly Variant[] nice = {
@@ -71,6 +73,7 @@ namespace Celeste.Mod.ARandomizerMod
 
 			new FloatVariant("GameSpeed", 0.1f, 0.9f, 1.0f, Variant.Level.DUBIOUS),
 			new FloatVariant("GameSpeed", 1.1f, 5.0f, 1.0f, Variant.Level.DUBIOUS),
+			new BooleanVariant("ThreeSixtyDashing", true, Variant.Level.DUBIOUS)
 
 			//new Variant("HiccupStrength", 3.0f, 5.0f, 1.0f, Variant.Level.DUBIOUS),
 
@@ -112,6 +115,7 @@ namespace Celeste.Mod.ARandomizerMod
 			new FloatVariant("BlurLevel", 0.1f, 0.7f, 0.0f, Variant.Level.TAME),
 
 			new FloatVariant("ZoomLevel", 0.1f, 1.9f, 1.0f, Variant.Level.TAME),
+            new FloatVariant("JumpDuration", 30f, 100f, 1f, Variant.Level.TAME),
         };
 
 		public static readonly Variant[] nasty = {
@@ -136,17 +140,17 @@ namespace Celeste.Mod.ARandomizerMod
 				new IntegerVariant("OshiroCount", 1, 2, 0, Variant.Level.SUB),
 				new IntegerVariant("ReverseOshiroCount", 0, 0, 0, Variant.Level.SUB)
 				}),
-            new BooleanVariant("OshiroEverywhere", true, Variant.Level.NASTY,
+			new BooleanVariant("OshiroEverywhere", true, Variant.Level.NASTY,
 				subVariants: new Variant[]
 				{
-                new IntegerVariant("OshiroCount", 0, 0, 0, Variant.Level.SUB),
-                new IntegerVariant("ReverseOshiroCount", 1, 2, 0, Variant.Level.SUB)
+				new IntegerVariant("OshiroCount", 0, 0, 0, Variant.Level.SUB),
+				new IntegerVariant("ReverseOshiroCount", 1, 2, 0, Variant.Level.SUB)
 				}),
-            new BooleanVariant("OshiroEverywhere", true, Variant.Level.NASTY,
+			new BooleanVariant("OshiroEverywhere", true, Variant.Level.NASTY,
 				subVariants: new Variant[]
 				{
-                new IntegerVariant("OshiroCount", 1, 1, 0, Variant.Level.SUB),
-                new IntegerVariant("ReverseOshiroCount", 1, 1, 0, Variant.Level.SUB)
+				new IntegerVariant("OshiroCount", 1, 1, 0, Variant.Level.SUB),
+				new IntegerVariant("ReverseOshiroCount", 1, 1, 0, Variant.Level.SUB)
 				}),
             //new IntegerVariant("WindEverywhere", 4, 5, 0, Variant.Level.NASTY),
 			new IntegerVariant("WindEverywhere", 10, 11, 0, Variant.Level.NASTY),
@@ -154,17 +158,17 @@ namespace Celeste.Mod.ARandomizerMod
 			new BooleanVariant("SnowballsEverywhere", true, Variant.Level.NASTY,
 				subVariants: new Variant[]
 				{
-                    new FloatVariant("SnowballDelay", 0.0f, 2.0f, 0.8f, Variant.Level.SUB)
-                }),
-            new FloatVariant("RegularHiccups", 0.3f, 0.6f, 0.0f, Variant.Level.DUBIOUS),
+					new FloatVariant("SnowballDelay", 0.0f, 2.0f, 0.8f, Variant.Level.SUB)
+				}),
+			new FloatVariant("RegularHiccups", 0.3f, 0.6f, 0.0f, Variant.Level.DUBIOUS),
 
-            new IntegerVariant("AddSeekers", 2, 2, 0, Variant.Level.NASTY),
+			new IntegerVariant("AddSeekers", 2, 2, 0, Variant.Level.NASTY),
 
 			new BooleanVariant("RisingLavaEverywhere", true, Variant.Level.NASTY,
 				subVariants: new Variant[]
 				{
-                    new FloatVariant("RisingLavaSpeed", 0.8f, 2.0f, 1.0f, Variant.Level.SUB)
-                }),
+					new FloatVariant("RisingLavaSpeed", 0.8f, 2.0f, 1.0f, Variant.Level.SUB)
+				}),
 
 			new IntegerVariant("Stamina", 0, 49, 110, Variant.Level.NASTY),
 			new BooleanVariant("AllStrawberriesAreGoldens", true, Variant.Level.NASTY),
@@ -175,7 +179,8 @@ namespace Celeste.Mod.ARandomizerMod
 
 			//new Variant("GlitchEffect", 0.1f, 0.5f, 0.0f, Variant.Level.NASTY),
 			new FloatVariant("ZoomLevel", 2.0f, 2.9f, 1.0f, Variant.Level.NASTY),
-            new BooleanVariant("BounceEverywhere", true, Variant.Level.FUCKED_UP),
+			new BooleanVariant("BounceEverywhere", true, Variant.Level.NASTY),
+			new BooleanVariant("NoGrabbing", true, Variant.Level.NASTY),
         };
 
 		public static readonly Variant[] FUCKED_UP = {
@@ -207,13 +212,15 @@ namespace Celeste.Mod.ARandomizerMod
 			new FloatVariant("BackgroundBrightness", -1.0f, 5.0f, 1.0f, Variant.Level.SILLY),
 			new FloatVariant("RoomBloom", -1.0f, 5.0f, 0.0f, Variant.Level.SILLY),
 
-			new FloatVariant("AnxietyEffect", -1.0f, 10.0f, 0.0f,  Variant.Level.SILLY),
+			new FloatVariant("AnxietyEffect", -1.0f, 5.0f, 0.0f,  Variant.Level.SILLY),
 			new FloatVariant("BackgroundBlurLevel", -1.0f, 10.0f, 0.0f, Variant.Level.SILLY),
 
 			//TODO: Color Grading would be awesome
 
 			new IntegerVariant("SpinnerColor", 3, 3, 0, Variant.Level.SILLY),
-			new BooleanVariant("FriendlyBadelineFollower", true, Variant.Level.SILLY)
+			new BooleanVariant("FriendlyBadelineFollower", true, Variant.Level.SILLY),
+			new BooleanVariant("PlayAsBadeline", true, Variant.Level.SILLY),
+
 		};
     }
 }
