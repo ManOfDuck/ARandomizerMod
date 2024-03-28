@@ -57,7 +57,7 @@ namespace Celeste.Mod.ARandomizerMod {
 
         private void OnReceiveTest(TestData data)
         {
-            Logger.Log(LogLevel.Debug, "ARandomizerMod", data.Message);
+            Logger.Log(LogLevel.Info, "ARandomizerMod", data.Message);
         }
 
         public override void Unload()

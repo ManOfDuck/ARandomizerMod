@@ -62,7 +62,7 @@
         <ItemGroup>
             <FilesToPackage Include="$(ZippedFiles)" />
         </ItemGroup>
-        <PackageMod Files="@(FilesToPackage)" OutputPath="..\CelesteMod.zip" />
+        <PackageMod Files="@(FilesToPackage)" OutputPath="..\ARandomizerMod.zip" />
     </Target>
     
     <PropertyGroup>
