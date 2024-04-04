@@ -27,14 +27,34 @@ namespace Celeste.Mod.ARandomizerMod
             valueString = intValue.ToString();
         }
 
-        override public void Trigger()
+        override public bool Trigger()
         {
-            ExtendedVariantImports.TriggerIntegerVariant?.Invoke(name, intValue, false);
+            try
+            {
+                ExtendedVariantImports.TriggerIntegerVariant?.Invoke(name, intValue, false);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Triggering variant " + name + " with value " + intValue + " failed! " +
+                    "Exception follows:\n" + e.Message);
+                return false;
+            }
         }
 
-        override public void Reset()
+        override public bool Reset()
         {
-            ExtendedVariantImports.TriggerIntegerVariant?.Invoke(name, defaultInt, false);
+            try
+            {
+                ExtendedVariantImports.TriggerIntegerVariant?.Invoke(name, defaultInt, false);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Resetting variant " + name + "failed! " +
+                    "Exception follows:\n" + e.Message);
+                return false;
+            }
         }
     }
 

@@ -18,13 +18,13 @@ namespace Celeste.Mod.ARandomizerMod
 
         protected override void DoCost()
         {
-            if (this.cost != 0) return;
+            if (this.Cost != 0) return;
 
             base.DoCost();
 
             foreach (Variant subVariant in subVariants)
             {
-                subVariant.cost = (int)(this.cost / (float)subVariants.Length);
+                subVariant.Cost = (int)(this.Cost / (float)subVariants.Length);
             }
         }
 
@@ -33,18 +33,44 @@ namespace Celeste.Mod.ARandomizerMod
             valueString = status.ToString();
         }
 
-        override public void Trigger()
+        override public bool Trigger()
         {
-            ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, status, false);
-            foreach (Variant subVariant in subVariants)
-                subVariant.Trigger();
+            try
+            {
+                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, status, false);
+                foreach (Variant subVariant in subVariants)
+                    if (!subVariant.Trigger())
+                    {
+                        return false;
+                    }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Triggering variant " + name + " with value " + status + " failed! " +
+                    "Exception follows:\n" + e.Message);
+                return false;
+            }
         }
 
-        override public void Reset()
+        override public bool Reset()
         {
-            ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, !status, false);
-            foreach (Variant subVariant in subVariants)
-                subVariant.Reset();
+            try
+            {
+                ExtendedVariantImports.TriggerBooleanVariant?.Invoke(name, !status, false);
+                foreach (Variant subVariant in subVariants)
+                    if (!subVariant.Reset())
+                    {
+                        return false;
+                    }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Triggering variant " + name + " failed! " +
+                    "Exception follows:\n" + e.Message);
+                return false;
+            }
         }
     }
 

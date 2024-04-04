@@ -26,14 +26,34 @@ namespace Celeste.Mod.ARandomizerMod
             valueString = floatValue.ToString();
         }
 
-        override public void Trigger()
+        override public bool Trigger()
         {
-            ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, floatValue, false);
+            try
+            {
+                ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, floatValue, false);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Triggering variant " + name + " with value " + floatValue + " failed! " +
+                    "Exception follows:\n" + e.Message);
+                return false;
+            }
         }
 
-        override public void Reset()
+        override public bool Reset()
         {
-            ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, defaultFloat, false);
+            try
+            {
+                ExtendedVariantImports.TriggerFloatVariant?.Invoke(name, defaultFloat, false);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Resetting variant " + name + "failed! " +
+                    "Exception follows:\n" + e.Message);
+                return false;
+            }
         }
     }
 

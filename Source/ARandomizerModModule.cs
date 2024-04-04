@@ -72,7 +72,7 @@ namespace Celeste.Mod.ARandomizerMod {
 
         private static void OnReceiveTest(TestData data)
         {
-            Logger.Log(LogLevel.Info, "ARandomizerMod", data.Message);
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), data.Message);
         }
 
         private void OnLoadingThread(Level level)
@@ -141,7 +141,7 @@ namespace Celeste.Mod.ARandomizerMod {
         {
             foreach (Variant v in list)
             {
-                Logger.Log(LogLevel.Warn, "ARandomizerMod", v.name);
+                Logger.Log(LogLevel.Warn, nameof(ARandomizerModModule), v.name);
                 v.SetValue();
                 VariantManager.TriggerVariant(v);
             }

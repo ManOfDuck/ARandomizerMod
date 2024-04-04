@@ -21,7 +21,7 @@ namespace Celeste.Mod.ARandomizerMod
 
         public string name;
 
-        public int cost { get; set; }
+        public int Cost { get; set; }
 
         public enum Level { GREAT, GOOD, NICE, SILLY, DUBIOUS, TAME, NASTY, FUCKED_UP, SUB };
         public Level level;
@@ -37,22 +37,24 @@ namespace Celeste.Mod.ARandomizerMod
 
         virtual protected void DoCost()
         {
-            cost = costPerLevel[level];
+            Cost = costPerLevel[level];
         }
 
         virtual public void SetValue()
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented SetValue() method");
+            Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Unimplemented SetValue() method");
         }
 
-        virtual public void Trigger()
+        virtual public bool Trigger()
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented Trigger() method");
+            Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Unimplemented Trigger() method");
+            return false;
         }
 
-        virtual public void Reset()
+        virtual public bool Reset()
         {
-            Logger.Log(LogLevel.Error, "ARandomizerMod", "Unimplemented Reset() method");
+            Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Unimplemented Reset() method");
+            return false;
         }
     }
 
@@ -80,7 +82,7 @@ namespace Celeste.Mod.ARandomizerMod
                     return reader.ReadBooleanVariant();
                 default:
                     // Variant type is unimplemented, error out
-                    Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Type");
+                    Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Unrecognized Variant Type");
                     return null;
             }
         }

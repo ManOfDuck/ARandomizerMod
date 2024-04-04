@@ -155,7 +155,7 @@ namespace Celeste.Mod.ARandomizerMod
             Color color;
             if (selectedNode is not null && selectedNode.Value.name == variant.name)
             {
-                color = (variant.cost <= EconomyManager.money) ? selectionColor : cantAffordSelectionColor;
+                color = (variant.Cost <= EconomyManager.money) ? selectionColor : cantAffordSelectionColor;
             }
             else
             {
@@ -171,11 +171,11 @@ namespace Celeste.Mod.ARandomizerMod
         private void RenderCost(Variant variant, float line)
         {
             Color color;
-            if (variant.cost < 0)
+            if (variant.Cost < 0)
             {
                 color = (selectedNode.Value.name.Equals(variant.name)) ? sellColor : sellSelectedColor;
             }
-            else if (variant.cost <= EconomyManager.money)
+            else if (variant.Cost <= EconomyManager.money)
             {
                 color = (selectedNode.Value.name.Equals(variant.name)) ? canAffordSelectedColor : canAffordColor;
             }
@@ -184,8 +184,8 @@ namespace Celeste.Mod.ARandomizerMod
                 color = (selectedNode.Value.name.Equals(variant.name)) ? cantAffordSelectedColor : cantAffordColor;
             }
             int offset = textOffset;
-            string prefix = (variant.cost < 0) ? "+$" : "$";
-            string text = prefix + Math.Abs(variant.cost);
+            string prefix = (variant.Cost < 0) ? "+$" : "$";
+            string text = prefix + Math.Abs(variant.Cost);
 
             RenderText(text, color, line, offset);
         }
@@ -277,7 +277,7 @@ namespace Celeste.Mod.ARandomizerMod
             if (ARandomizerModModule.Settings.Select.Pressed && selectedNode != null && selectedNode.Value != null)
             {
                 ARandomizerModModule.Settings.Select.ConsumePress();
-                if (selectedNode.Value.cost <= EconomyManager.money)
+                if (selectedNode.Value.Cost <= EconomyManager.money)
                 {
                     EconomyManager.PurchaseVariantRemoval(selectedNode.Value);
                     NavigateDown();

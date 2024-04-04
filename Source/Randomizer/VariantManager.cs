@@ -150,7 +150,8 @@ namespace Celeste.Mod.ARandomizerMod
         public static void TriggerVariant(Variant variant)
         {
             Logger.Log(LogLevel.Info, "ARandomizerMod", "Activating variant " + variant.name + "...");
-            variant.Trigger();
+            if (!variant.Trigger())
+                return;
 
             foreach (Variant activeVariant in activeVariants)
             {
@@ -180,7 +181,9 @@ namespace Celeste.Mod.ARandomizerMod
         {
             Logger.Log(LogLevel.Info, "ARandomizerMod", "Resetting variant " + variant.name + "...");
 
-            variant.Reset();
+            if (!variant.Reset())
+                return;
+
             activeVariants.Remove(variant);
         }
 
@@ -192,7 +195,7 @@ namespace Celeste.Mod.ARandomizerMod
             LinkedListNode<Variant> node = activeVariants.First;
             for (int i = 0; i < activeVariants.Count; i++)
             {
-                if (i >= variantToReset && node.Value.cost < 200)
+                if (i >= variantToReset && node.Value.Cost < 200)
                 {
                     ResetVariant(node.Value);
                     return;
