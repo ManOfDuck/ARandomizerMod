@@ -1,61 +1,54 @@
 ﻿using Celeste.Mod.ARandomizerMod.CelesteNet;
-using Monocle;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Celeste.Mod.ARandomizerMod
 {
     public static class EconomyManager
     {
-        public static int money = 0;
-        readonly static int moneyGainedPerRoom = 50;
-        readonly static int strawberryMoney = 150;
-        readonly static int cassetteMoney = 500;
-        readonly static int heartMoney = 1000;
-        readonly static float variantCostToGainRatio = 0f;
+        public static int Money { get; private set; } = 0;
+        private static readonly int moneyGainedPerRoom = 50;
+        private static readonly int strawberryMoney = 150;
+        private static readonly int cassetteMoney = 500;
+        private static readonly int heartMoney = 1000;
+        private static readonly float variantCostToGainRatio = 0f;
 
-        public static int score = 0;
-        readonly static int scoreGainedPerRoom = 100;
-        readonly static int strawberryScore = 1000;
-        readonly static int cassetteScore = 50000;
-        readonly static int heartScore = 10000;
-        readonly static float variantCostToScoreRatio = 0.1f;
+        public static int Score { get; private set; } = 0;
+        private static readonly int scoreGainedPerRoom = 100;
+        private static readonly int strawberryScore = 1000;
+        private static readonly int cassetteScore = 50000;
+        private static readonly int heartScore = 10000;
+        private static readonly float variantCostToScoreRatio = 0.1f;
 
         public static void CassetteCollected()
         {
-            money += cassetteMoney;
-            score += cassetteScore;
+            Money += cassetteMoney;
+            Score += cassetteScore;
         }
 
         public static void StrawberryCollected()
         {
-            money += strawberryMoney;
-            score += strawberryScore;
+            Money += strawberryMoney;
+            Score += strawberryScore;
         }
         public static void HeartCollected()
         {
-            money += heartMoney;
-            score += heartScore;
+            Money += heartMoney;
+            Score += heartScore;
         }
 
         public static void RoomCleared()
         {
-            money += moneyGainedPerRoom;
-            score += scoreGainedPerRoom;
-            foreach (Variant variant in VariantManager.activeVariants)
+            Money += moneyGainedPerRoom;
+            Score += scoreGainedPerRoom;
+            foreach (Variant variant in VariantManager.ActiveVariants)
             {
-                money += (int)(variant.cost * variantCostToGainRatio);
-                score += (int)(variant.cost * variantCostToScoreRatio);
+                Money += (int)(variant.Cost * variantCostToGainRatio);
+                Score += (int)(variant.Cost * variantCostToScoreRatio);
             }
         }
 
         public static void PurchaseVariantRemoval(Variant variant)
         {
-            money -= variant.cost;
+            Money -= variant.Cost;
             CNetComm.Instance.SendVariantUpdate(VariantManager.AllRoomsIdentifier, variant, CelesteNet.Data.VariantUpdateData.Operation.REMOVE);
         }
     }

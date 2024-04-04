@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using Celeste.Mod.ARandomizerMod.CelesteNet;
 using Celeste.Mod.ARandomizerMod.CelesteNet.Data;
 using Celeste.Mod.ARandomizerMod.Data;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.ModInterop;
-using DifficultyOptions = Celeste.Mod.ARandomizerMod.ARandomizerModModuleSettings.DifficultyOptions;
-using Lists = Celeste.Mod.ARandomizerMod.VariantLists;
 
-namespace Celeste.Mod.ARandomizerMod {
+namespace Celeste.Mod.ARandomizerMod
+{
     public class ARandomizerModModule : EverestModule {
         public static readonly string ProtocolVersion = "1_0_2";
 

@@ -1,11 +1,8 @@
 ﻿using Celeste.Mod.ARandomizerMod.CelesteNet;
 using Celeste.Mod.ARandomizerMod.CelesteNet.Data;
-using Monocle;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Celeste.Mod.ARandomizerMod
 {
@@ -13,17 +10,17 @@ namespace Celeste.Mod.ARandomizerMod
     {
         public static readonly string AllRoomsIdentifier = "ALL_ROOMS";
 
-        public static Dictionary<string, LinkedList<Variant>> variantsByRoomName = new();
-        public static LinkedList<Variant> activeVariants = new();
+        public static Dictionary<string, LinkedList<Variant>> VariantsByRoomName { get; private set; } = new();
+        public static LinkedList<Variant> ActiveVariants { get; private set; } = new();
         private static LevelData currentRoom;
 
         public static void RoomLoaded(LevelData room)
         {
             currentRoom = room;
 
-            if (variantsByRoomName.ContainsKey(room.Name))
+            if (VariantsByRoomName.ContainsKey(room.Name))
             {
-                MatchVariantList(variantsByRoomName[room.Name]);
+                MatchVariantList(VariantsByRoomName[room.Name]);
             }
             else
             {
@@ -31,9 +28,9 @@ namespace Celeste.Mod.ARandomizerMod
                 RandomizeNewVariants();
 
                 // Update this room for all clients
-                foreach (Variant variant in activeVariants)
+                foreach (Variant variant in ActiveVariants)
                 {
-                    Logger.Log(LogLevel.Info, "ARandomizerMod", "Sending variant " + variant.name + " with value " + variant.valueString);
+                    Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString);
                     CNetComm.Instance.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
                 }
             }
@@ -44,9 +41,9 @@ namespace Celeste.Mod.ARandomizerMod
             string roomName = data.roomName;
             Variant variant = data.variant;
             VariantUpdateData.Operation operation = data.operation;
-            Logger.Log(LogLevel.Info, "ARandomizerMod", "Received variant " + variant.name + " with value " + variant.valueString);
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Received variant " + variant.name + " with value " + variant.valueString);
 
-            if (roomName.Equals(AllRoomsIdentifier))
+            if (roomName.Equals(AllRoomsIdentifier, StringComparison.Ordinal))
             {
                 // Peform opertaion on all existing rooms
                 switch (operation)
@@ -60,20 +57,20 @@ namespace Celeste.Mod.ARandomizerMod
                         ResetVariant(variant);
                         break;
                     default:
-                        Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Operation");
+                        Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Unrecognized Variant Operation");
                         break;
                 }
             }
             else if (roomName is not null)
             {
                 // Create a new dictionary entry, if neccessary
-                if (!variantsByRoomName.ContainsKey(roomName))
-                    variantsByRoomName.Add(roomName, new());
+                if (!VariantsByRoomName.ContainsKey(roomName))
+                    VariantsByRoomName.Add(roomName, new());
 
                 switch (operation)
                 {
                     case VariantUpdateData.Operation.ADD:
-                        variantsByRoomName[roomName].AddLast(variant);
+                        VariantsByRoomName[roomName].AddLast(variant);
                         // If we're in this room, trigger this variant
                         if (currentRoom?.Name.Equals(roomName) == true)
                         {
@@ -81,7 +78,7 @@ namespace Celeste.Mod.ARandomizerMod
                         }
                         break;
                     case VariantUpdateData.Operation.REMOVE:
-                        variantsByRoomName[roomName].Remove(variant);
+                        VariantsByRoomName[roomName].Remove(variant);
                         // If we're in this room, reset this variant
                         if (currentRoom?.Name.Equals(roomName) == true)
                         {
@@ -89,7 +86,7 @@ namespace Celeste.Mod.ARandomizerMod
                         }
                         break;
                     default:
-                        Logger.Log(LogLevel.Error, "ARandomizerMod", "Unrecognized Variant Operation");
+                        Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Unrecognized Variant Operation");
                         break;
                 }
             }
@@ -97,17 +94,17 @@ namespace Celeste.Mod.ARandomizerMod
 
         private static void AddVariantToAllRooms(Variant variant)
         {
-            foreach (string roomName in variantsByRoomName.Keys)
+            foreach (string roomName in VariantsByRoomName.Keys)
             {
-                variantsByRoomName[roomName].AddLast(variant);
+                VariantsByRoomName[roomName].AddLast(variant);
             }
         }
 
         private static void RemoveVariantFromAllRooms(Variant variant)
         {
-            foreach (string roomName in variantsByRoomName.Keys)
+            foreach (string roomName in VariantsByRoomName.Keys)
             {
-                variantsByRoomName[roomName].Remove(variant);
+                VariantsByRoomName[roomName].Remove(variant);
             }
 
         }
@@ -133,12 +130,12 @@ namespace Celeste.Mod.ARandomizerMod
         {
             foreach (Variant variant in targetList)
             {
-                if (!activeVariants.Contains(variant))
+                if (!ActiveVariants.Contains(variant))
                 {
                     TriggerVariant(variant);
                 }
             }
-            foreach (Variant variant in activeVariants.ToArray()) // Convert to array to avoid concurrent modification exceptions
+            foreach (Variant variant in ActiveVariants.ToArray()) // Convert to array to avoid concurrent modification exceptions
             {
                 if (!targetList.Contains(variant))
                 {
@@ -149,25 +146,25 @@ namespace Celeste.Mod.ARandomizerMod
 
         public static void TriggerVariant(Variant variant)
         {
-            Logger.Log(LogLevel.Info, "ARandomizerMod", "Activating variant " + variant.name + "...");
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Activating variant " + variant.name + "...");
             if (!variant.Trigger())
                 return;
 
-            foreach (Variant activeVariant in activeVariants)
+            foreach (Variant activeVariant in ActiveVariants)
             {
                 if (activeVariant.name.Equals(variant.name))
                 {
-                    activeVariants.Remove(activeVariant);
+                    ActiveVariants.Remove(activeVariant);
                     break;
                 }
             }
 
-            activeVariants.AddLast(variant);
+            ActiveVariants.AddLast(variant);
         }
 
         public static Variant GetVariantWithName(string name)
         {
-            foreach (Variant variant in activeVariants)
+            foreach (Variant variant in ActiveVariants)
             {
                 if (variant.name.Equals(name))
                 {
@@ -179,21 +176,21 @@ namespace Celeste.Mod.ARandomizerMod
 
         public static void ResetVariant(Variant variant)
         {
-            Logger.Log(LogLevel.Info, "ARandomizerMod", "Resetting variant " + variant.name + "...");
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Resetting variant " + variant.name + "...");
 
             if (!variant.Reset())
                 return;
 
-            activeVariants.Remove(variant);
+            ActiveVariants.Remove(variant);
         }
 
         public static void ResetRandomVariant()
         {
-            if (activeVariants.Count < 1) return;
+            if (ActiveVariants.Count < 1) return;
 
-            int variantToReset = new Random().Next(activeVariants.Count);
-            LinkedListNode<Variant> node = activeVariants.First;
-            for (int i = 0; i < activeVariants.Count; i++)
+            int variantToReset = new Random().Next(ActiveVariants.Count);
+            LinkedListNode<Variant> node = ActiveVariants.First;
+            for (int i = 0; i < ActiveVariants.Count; i++)
             {
                 if (i >= variantToReset && node.Value.Cost < 200)
                 {
@@ -208,14 +205,14 @@ namespace Celeste.Mod.ARandomizerMod
 
         public static void ResetAllVariants()
         {
-            Variant[] variantsToReset = activeVariants.ToArray();
+            Variant[] variantsToReset = ActiveVariants.ToArray();
 
             foreach (Variant variant in variantsToReset)
             {
                 ResetVariant(variant);
             }
 
-            activeVariants.Clear();
+            ActiveVariants.Clear();
         }
     }
 }
