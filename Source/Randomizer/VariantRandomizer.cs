@@ -5,8 +5,11 @@ using Monocle;
 
 namespace Celeste.Mod.ARandomizerMod
 {
-	public class VariantRandomizer
+	public static class VariantRandomizer
 	{
+
+        public static readonly Random randomGenerator = new();
+
         private static readonly Dictionary<DifficultyOptions, int[]> variantRolls = new Dictionary<DifficultyOptions, int[]>
         {
             // { min rolls, max rolls}
@@ -25,13 +28,12 @@ namespace Celeste.Mod.ARandomizerMod
             int[] rollsRange = variantRolls[difficulty];
             float[] ranges = variantRanges[difficulty];
 
-            Random random = new();
-            int rolls = random.Next(rollsRange[0], rollsRange[1]);
+            int rolls = randomGenerator.Next(rollsRange[0], rollsRange[1]);
 
             LinkedList<Variant> variants = new();
             for (int i = 0; i < rolls; i++)
             {
-                float roll = random.NextFloat(1);
+                float roll = randomGenerator.NextFloat(1);
 
                 if (roll < ranges[0])
                 {

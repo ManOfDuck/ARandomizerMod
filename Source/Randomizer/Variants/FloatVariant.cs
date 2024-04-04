@@ -22,8 +22,7 @@ namespace Celeste.Mod.ARandomizerMod
 
         override public void SetValue()
         {
-            Random random = new();
-            floatValue = random.NextFloat(maxFloat - minFloat) + minFloat;
+            floatValue = VariantRandomizer.randomGenerator.NextFloat(maxFloat - minFloat) + minFloat;
             valueString = floatValue.ToString();
         }
 

@@ -125,7 +125,7 @@ namespace Celeste.Mod.ARandomizerMod {
             VariantManager.ProcessVariantUpdate(data);
         }
 
-        private void TestAllVariants()
+        private static void TestAllVariants()
         {
             TestVariantList(VariantLists.FUCKED_UP);
             TestVariantList(VariantLists.nasty);
@@ -142,6 +142,7 @@ namespace Celeste.Mod.ARandomizerMod {
             foreach (Variant v in list)
             {
                 Logger.Log(LogLevel.Warn, "ARandomizerMod", v.name);
+                v.SetValue();
                 VariantManager.TriggerVariant(v);
             }
         }

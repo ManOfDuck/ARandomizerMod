@@ -23,8 +23,7 @@ namespace Celeste.Mod.ARandomizerMod
 
         override public void SetValue()
         {
-            Random random = new();
-            intValue = random.Next(minInt, maxInt);
+            intValue = VariantRandomizer.randomGenerator.Next(minInt, maxInt);
             valueString = intValue.ToString();
         }
 
