@@ -25,9 +25,6 @@ namespace Celeste.Mod.ARandomizerMod
             }
             else
             {
-                TestAllVariants();
-                return;
-
                 // Update active variants
                 RandomizeNewVariants();
 
