@@ -134,11 +134,11 @@ namespace Celeste.Mod.ARandomizerMod
             int line = 0;
             while (node != null)
             {
-                RenderVariant(node.Value, ref line);
                 if (selectedNode is not null)
                 {
                     RenderCost(node.Value, line);
                 }
+                RenderVariant(node.Value, ref line);
                 node = node.Next;
             }
         }
@@ -156,7 +156,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
             int offset = (variant.level == Variant.Level.SUB) ? subVariantOffset : 0;
             offset += (selectedNode is not null) ? costOffset : textOffset;
-            string text = variant.name + ": " + variant.valueString;
+            string text = variant is BooleanVariant ? variant.name : variant.name + ": " + variant.valueString;
             
             RenderText(text, color, line, offset);
             line++;
