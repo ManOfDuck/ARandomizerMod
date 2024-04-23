@@ -98,7 +98,7 @@ namespace Celeste.Mod.ARandomizerMod
 			new FloatVariant("Friction", 0.1f, 0.3f, 1.0f, Variant.Level.TAME),
 			new IntegerVariant("DisableClimbingUpOrDown", 1, 3, 0, Variant.Level.TAME),
 
-			new IntegerVariant("ChaserCount", 3, 10, 0, Variant.Level.TAME),
+			//new IntegerVariant("ChaserCount", 3, 10, 0, Variant.Level.TAME),
 
             new IntegerVariant("AddSeekers", 1, 1, 0, Variant.Level.TAME),
 			new IntegerVariant("WindEverywhere", 2, 3, 0, Variant.Level.TAME),

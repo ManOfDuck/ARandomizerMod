@@ -122,27 +122,5 @@ namespace Celeste.Mod.ARandomizerMod
         {
             VariantManager.ProcessVariantUpdate(data);
         }
-
-        private static void TestAllVariants()
-        {
-            TestVariantList(VariantLists.FUCKED_UP);
-            TestVariantList(VariantLists.nasty);
-            TestVariantList(VariantLists.tame);
-            TestVariantList(VariantLists.dubious);
-            TestVariantList(VariantLists.silly);
-            TestVariantList(VariantLists.nice);
-            TestVariantList(VariantLists.good);
-            TestVariantList(VariantLists.great);
-        }
-
-        private static void TestVariantList(Variant[] list)
-        {
-            foreach (Variant v in list)
-            {
-                Logger.Log(LogLevel.Warn, nameof(ARandomizerModModule), v.name);
-                v.SetValue();
-                VariantManager.TriggerVariant(v);
-            }
-        }
     }
 }

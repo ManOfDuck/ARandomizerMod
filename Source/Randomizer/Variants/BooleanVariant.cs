@@ -31,6 +31,10 @@ namespace Celeste.Mod.ARandomizerMod
         override public void SetValue()
         {
             valueString = status.ToString();
+            foreach (Variant subVariant in subVariants)
+            {
+                subVariant.SetValue();
+            }
         }
 
         override public bool Trigger()
@@ -67,7 +71,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
             catch (Exception e)
             {
-                Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Triggering variant " + name + " failed! " +
+                Logger.Log(LogLevel.Error, nameof(ARandomizerModModule), "Resetting variant " + name + " failed! " +
                     "Exception follows:\n" + e.Message);
                 return false;
             }
@@ -83,6 +87,8 @@ namespace Celeste.Mod.ARandomizerMod
             Variant.Level level = (Variant.Level)reader.ReadInt32();
             string valueString = reader.ReadString();
 
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Reading: " + name + " with value " + valueString);
+
             // Read class-specific data
             bool status = reader.ReadBoolean();
 
@@ -95,6 +101,8 @@ namespace Celeste.Mod.ARandomizerMod
             {
                 subVariants[i] = reader.ReadVariant();
             }
+
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Subvariants!!!! " + subVariants);
 
             // Deserialize variant
             BooleanVariant booleanVariant = new(name, status, level, subVariants)

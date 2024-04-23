@@ -131,10 +131,10 @@ namespace Celeste.Mod.ARandomizerMod
         private void RenderActiveVariants()
         {
             LinkedListNode<Variant> node = VariantManager.ActiveVariants.First;
-            for (int line = 0; line < VariantManager.ActiveVariants.Count; line++)
+            int line = 0;
+            while (node != null)
             {
-                if (node == null) break; // for safety, should never happen
-                RenderVariant(node.Value, line);
+                RenderVariant(node.Value, ref line);
                 if (selectedNode is not null)
                 {
                     RenderCost(node.Value, line);
@@ -143,7 +143,7 @@ namespace Celeste.Mod.ARandomizerMod
             }
         }
 
-        private void RenderVariant(Variant variant, float line)
+        private void RenderVariant(Variant variant, ref int line)
         {
             Color color;
             if (selectedNode is not null && selectedNode.Value.name == variant.name)
@@ -159,6 +159,15 @@ namespace Celeste.Mod.ARandomizerMod
             string text = variant.name + ": " + variant.valueString;
             
             RenderText(text, color, line, offset);
+            line++;
+
+            if (variant is BooleanVariant booleanVariant)
+            {
+                foreach(Variant subVariant in booleanVariant.subVariants)
+                {
+                    RenderVariant(subVariant, ref line);
+                }
+            }
         }
 
         private void RenderCost(Variant variant, float line)

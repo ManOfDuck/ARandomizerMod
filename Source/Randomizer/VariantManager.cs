@@ -18,12 +18,16 @@ namespace Celeste.Mod.ARandomizerMod
         {
             currentRoom = room;
 
+
             if (VariantsByRoomName.ContainsKey(room.Name))
             {
                 MatchVariantList(VariantsByRoomName[room.Name]);
             }
             else
             {
+                TestAllVariants();
+                return;
+
                 // Update active variants
                 RandomizeNewVariants();
 
@@ -213,6 +217,29 @@ namespace Celeste.Mod.ARandomizerMod
             }
 
             ActiveVariants.Clear();
+        }
+
+        private static void TestAllVariants()
+        {
+            TestVariantList(VariantLists.FUCKED_UP);
+            TestVariantList(VariantLists.nasty);
+            TestVariantList(VariantLists.tame);
+            TestVariantList(VariantLists.dubious);
+            TestVariantList(VariantLists.silly);
+            TestVariantList(VariantLists.nice);
+            TestVariantList(VariantLists.good);
+            TestVariantList(VariantLists.great);
+        }
+
+        private static void TestVariantList(Variant[] list)
+        {
+            foreach (Variant v in list)
+            {
+                Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Testing variant " + v.name + " with value " + v.valueString);
+                v.SetValue();
+                TriggerVariant(v);
+                CNetComm.Instance.SendVariantUpdate(currentRoom.Name, v, VariantUpdateData.Operation.ADD);
+            }
         }
     }
 }
