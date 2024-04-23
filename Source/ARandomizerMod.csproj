@@ -70,19 +70,20 @@
     </PropertyGroup>
 
     <!-- Inline task used to create a .zip for the mod -->
-    <UsingTask TaskName="PackageMod"
-               TaskFactory="RoslynCodeTaskFactory"
-               AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
-        <ParameterGroup>
-            <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
-            <OutputPath ParameterType="System.String" Required="true" />
-        </ParameterGroup>
-        <Task>
-            <Using Namespace="System.IO" />
-            <Using Namespace="System.IO.Compression" />
-            <Code Type="Fragment" Language="cs">
-            <![CDATA[
+	<UsingTask TaskName="PackageMod"
+				   TaskFactory="RoslynCodeTaskFactory"
+				   AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+		<ParameterGroup>
+			<Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+			<OutputPath ParameterType="System.String" Required="true" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System.IO" />
+			<Using Namespace="System.IO.Compression" />
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
                 var projectDir = Path.Combine(@"$(ProjectDir)", ".."); // Go one level up, since we're inside the 'Source' directory
+                projectDir = Uri.UnescapeDataString(projectDir);
             
                 if (File.Exists(OutputPath))
                     File.Delete(OutputPath);
@@ -113,14 +114,15 @@
                 
                     if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                        relativePath = relativePath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
                     }
                 
                     return relativePath;
                 }
             ]]>
-            </Code>
-        </Task>
-    </UsingTask>
+			</Code>
+		</Task>
+	</UsingTask>
+
 
 </Project>
