@@ -251,10 +251,10 @@ namespace Celeste.Mod.ARandomizerMod
         {
             ControlsDisabled = false;
 
-            int jumpCount = int.Parse(VariantManager.GetVariantWithName("JumpCount")?.valueString ?? "1");
-            int dashRestriction = int.Parse(VariantManager.GetVariantWithName("DashRestriction")?.valueString ?? "0");
-            bool disableWallJumping = bool.Parse(VariantManager.GetVariantWithName("DisableWallJumping")?.valueString ?? "False");
-            bool noGrabbing = bool.Parse(VariantManager.GetVariantWithName("NoGrabbing")?.valueString ?? "False");
+            int jumpCount = int.Parse(VariantManager.GetActiveVariantWithName("JumpCount")?.valueString ?? "1");
+            int dashRestriction = int.Parse(VariantManager.GetActiveVariantWithName("DashRestriction")?.valueString ?? "0");
+            bool disableWallJumping = bool.Parse(VariantManager.GetActiveVariantWithName("DisableWallJumping")?.valueString ?? "False");
+            bool noGrabbing = bool.Parse(VariantManager.GetActiveVariantWithName("NoGrabbing")?.valueString ?? "False");
 
             ExtendedVariantImports.TriggerIntegerVariant?.Invoke("JumpCount", jumpCount, false);
             ExtendedVariantImports.TriggerIntegerVariant?.Invoke("DashRestriction", dashRestriction, false);

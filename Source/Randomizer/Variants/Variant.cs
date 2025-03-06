@@ -35,6 +35,18 @@ namespace Celeste.Mod.ARandomizerMod
             DoCost();
         }
 
+        override public string ToString()
+        {
+            return (name + "," + valueString);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not Variant otherVariant) return false;
+
+            return (otherVariant.name == name && otherVariant.level == level && otherVariant.valueString == valueString);
+        }
+
         virtual protected void DoCost()
         {
             Cost = costPerLevel[level];

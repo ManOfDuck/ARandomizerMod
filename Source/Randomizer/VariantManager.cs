@@ -160,9 +160,14 @@ namespace Celeste.Mod.ARandomizerMod
             }
         }
 
-        public static Variant GetVariantWithName(string name)
+        public static Variant GetActiveVariantWithName(string name)
         {
-            foreach (Variant variant in ActiveVariants)
+            return GetVariantWithName(name, ActiveVariants);
+        }
+        
+        public static Variant GetVariantWithName(string name, LinkedList<Variant> list)
+        {
+            foreach (Variant variant in list)
             {
                 if (variant.name.Equals(name))
                 {
@@ -201,7 +206,8 @@ namespace Celeste.Mod.ARandomizerMod
         /// <param name="variant"></param>
         private static void ResetVariant(Variant variant)
         {
-            if (!ActiveVariants.Contains(variant)) return;
+            if(!ActiveVariants.Contains(variant)) return;
+
             Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Resetting variant " + variant.name + "...");
 
             if (!variant.Reset())
