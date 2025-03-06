@@ -31,8 +31,7 @@ namespace Celeste.Mod.ARandomizerMod
                 // Update this room for all clients
                 foreach (Variant variant in ActiveVariants)
                 {
-                    Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString);
-                    CNetComm.Instance.SendVariantUpdate(room.Name, variant, VariantUpdateData.Operation.ADD);
+                    
                 }
             }
         }
@@ -108,6 +107,23 @@ namespace Celeste.Mod.ARandomizerMod
                 VariantsByRoomName[roomName].Remove(variant);
             }
 
+        }
+
+        private static void AddVariantToRoom(Variant variant, string roomName)
+        {
+            VariantsByRoomName[roomName].AddLast(variant);
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString);
+            CNetComm.Instance.SendVariantUpdate(roomName, variant, VariantUpdateData.Operation.ADD);
+
+            if (currentRoom.Name == roomName)
+            {
+                TriggerVariant(variant);
+            }
+        }
+
+        private static void RemoveVariantFromRoom(Variant variant, string roomName)
+        {
+           // if (VariantsByRoomName[roomName].Contains(r)
         }
 
         private static void RandomizeNewVariants()
