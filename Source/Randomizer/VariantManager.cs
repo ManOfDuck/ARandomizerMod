@@ -36,7 +36,6 @@ namespace Celeste.Mod.ARandomizerMod
             string roomName = data.roomName;
             Variant variant = data.variant;
             VariantUpdateData.Operation operation = data.operation;
-            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Received variant " + variant.name + " with value " + variant.valueString);
 
             if (roomName.Equals(AllRoomsIdentifier, StringComparison.Ordinal))
             {
@@ -44,10 +43,12 @@ namespace Celeste.Mod.ARandomizerMod
                 switch (operation)
                 {
                     case VariantUpdateData.Operation.ADD:
+                        Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Received variant " + variant.name + " with value " + variant.valueString);
                         AddVariantToAllRooms(variant);
                         TriggerVariant(variant);
                         break;
                     case VariantUpdateData.Operation.REMOVE:
+                        Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Received reset of variant " + variant.name);
                         RemoveVariantFromAllRooms(variant);
                         ResetVariant(variant);
                         break;
@@ -122,7 +123,7 @@ namespace Celeste.Mod.ARandomizerMod
 
         public static void RemoveVariantFromRoom(Variant variant, string roomName)
         {
-            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString);
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending reset on variant " + variant.name);
             CNetComm.Instance.SendVariantUpdate(roomName, variant, VariantUpdateData.Operation.REMOVE);
         }
 
