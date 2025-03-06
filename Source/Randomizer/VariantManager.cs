@@ -105,12 +105,9 @@ namespace Celeste.Mod.ARandomizerMod
         {
             foreach (string roomName in VariantsByRoomName.Keys)
             {
-                foreach (Variant v in VariantsByRoomName[roomName])
-                {
-                    VariantsByRoomName[roomName].Remove(v);
-                    break;
-                }
+                VariantsByRoomName[roomName].Remove(variant);
             }
+
         }
 
         private static void RandomizeNewVariants()
