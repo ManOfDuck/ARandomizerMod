@@ -55,7 +55,7 @@ namespace Celeste.Mod.ARandomizerMod
                 switch (operation)
                 {
                     case VariantUpdateData.Operation.ADD:
-                        Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Received variant " + variant.name + " with value " + variant.valueString);
+                        Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Received variant " + variant.name + " with value " + variant.valueString + " in room " + roomName);
                         foreach (string name in VariantsByRoomName.Keys)
                         {
                             VariantsByRoomName[name].AddLast(variant);
@@ -63,7 +63,7 @@ namespace Celeste.Mod.ARandomizerMod
                         TriggerVariant(variant);
                         break;
                     case VariantUpdateData.Operation.REMOVE:
-                        Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Received reset of variant " + variant.name);
+                        Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Received reset of variant " + variant.name + " in all rooms");
                         foreach (string name in VariantsByRoomName.Keys)
                         {
                             VariantsByRoomName[name].Remove(variant);
@@ -84,18 +84,22 @@ namespace Celeste.Mod.ARandomizerMod
                 switch (operation)
                 {
                     case VariantUpdateData.Operation.ADD:
+                        Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Received variant " + variant.name + " with value " + variant.valueString + " in room " + roomName);
                         VariantsByRoomName[roomName].AddLast(variant);
                         // If we're in this room, trigger this variant
                         if (currentRoom?.Name.Equals(roomName) == true)
                         {
+                            Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Variant update is in current room");
                             TriggerVariant(variant);
                         }
                         break;
                     case VariantUpdateData.Operation.REMOVE:
+                        Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Received reset of variant " + variant.name + " in room " + roomName);
                         VariantsByRoomName[roomName].Remove(variant);
                         // If we're in this room, reset this variant
                         if (currentRoom?.Name.Equals(roomName) == true)
                         {
+                            Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Variant update is in current room");
                             ResetVariant(variant);
                         }
                         break;
@@ -128,13 +132,13 @@ namespace Celeste.Mod.ARandomizerMod
 
         public static void SendNewVariant(Variant variant, string roomName)
         {
-            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString);
+            Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString + " to room " + roomName);
             CNetComm.Instance.SendVariantUpdate(roomName, variant, VariantUpdateData.Operation.ADD);
         }
 
         public static void SendVariantRemoval(Variant variant, string roomName)
         {
-            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending reset on variant " + variant.name);
+            Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Sending reset on variant " + variant.name + " to room " + roomName);
             CNetComm.Instance.SendVariantUpdate(roomName, variant, VariantUpdateData.Operation.REMOVE);
         }
 
@@ -174,7 +178,8 @@ namespace Celeste.Mod.ARandomizerMod
         /// <param name="variant"></param>
         private static void TriggerVariant(Variant variant)
         {
-            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Activating variant " + variant.name + "...");
+            if (ActiveVariants.Contains(variant)) return;
+            Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Activating variant " + variant.name + "...");
             if (!variant.Trigger())
                 return;
 
@@ -196,7 +201,8 @@ namespace Celeste.Mod.ARandomizerMod
         /// <param name="variant"></param>
         private static void ResetVariant(Variant variant)
         {
-            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Resetting variant " + variant.name + "...");
+            if (!ActiveVariants.Contains(variant)) return;
+            Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Resetting variant " + variant.name + "...");
 
             if (!variant.Reset())
                 return;
@@ -220,7 +226,7 @@ namespace Celeste.Mod.ARandomizerMod
         {
             foreach (Variant v in list)
             {
-                Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Testing variant " + v.name + " with value " + v.valueString);
+                Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Testing variant " + v.name + " with value " + v.valueString);
                 v.SetValue();
                 TriggerVariant(v);
                 CNetComm.Instance.SendVariantUpdate(currentRoom.Name, v, VariantUpdateData.Operation.ADD);
