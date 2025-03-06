@@ -86,7 +86,7 @@ namespace Celeste.Mod.ARandomizerMod
         private static void LevelStarted(On.Celeste.LevelLoader.orig_StartLevel orig, LevelLoader self)
         {
             orig(self);
-            VariantManager.ResetAllVariants();
+            //VariantManager.ResetAllVariants();
         }
 
         private static IEnumerator RoomTransition(On.Celeste.Level.orig_TransitionRoutine orig, Level self, LevelData next, Vector2 direction)

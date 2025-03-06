@@ -21,18 +21,13 @@ namespace Celeste.Mod.ARandomizerMod
 
             if (VariantsByRoomName.ContainsKey(room.Name))
             {
+                // Update active variants
                 MatchVariantList(VariantsByRoomName[room.Name]);
             }
             else
             {
-                // Update active variants
+                // Add new variants
                 RandomizeNewVariants();
-
-                // Update this room for all clients
-                foreach (Variant variant in ActiveVariants)
-                {
-                    
-                }
             }
         }
 
@@ -92,38 +87,43 @@ namespace Celeste.Mod.ARandomizerMod
             }
         }
 
-        private static void AddVariantToAllRooms(Variant variant)
+        public static void AddVariantToCurrentRoom(Variant variant)
+        {
+            AddVariantToRoom(variant, currentRoom.Name);
+        }
+
+        public static void RemoveVariantFromCurrentRoom(Variant variant) 
+        { 
+            RemoveVariantFromRoom(variant, currentRoom.Name);
+        }
+
+        public static void AddVariantToAllRooms(Variant variant)
         {
             foreach (string roomName in VariantsByRoomName.Keys)
             {
-                VariantsByRoomName[roomName].AddLast(variant);
+                AddVariantToRoom(variant, roomName);
             }
         }
 
-        private static void RemoveVariantFromAllRooms(Variant variant)
+        public static void RemoveVariantFromAllRooms(Variant variant)
         {
             foreach (string roomName in VariantsByRoomName.Keys)
             {
-                VariantsByRoomName[roomName].Remove(variant);
+                RemoveVariantFromRoom(variant, roomName);
             }
 
         }
 
-        private static void AddVariantToRoom(Variant variant, string roomName)
+        public static void AddVariantToRoom(Variant variant, string roomName)
         {
-            VariantsByRoomName[roomName].AddLast(variant);
             Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString);
             CNetComm.Instance.SendVariantUpdate(roomName, variant, VariantUpdateData.Operation.ADD);
-
-            if (currentRoom.Name == roomName)
-            {
-                TriggerVariant(variant);
-            }
         }
 
-        private static void RemoveVariantFromRoom(Variant variant, string roomName)
+        public static void RemoveVariantFromRoom(Variant variant, string roomName)
         {
-           // if (VariantsByRoomName[roomName].Contains(r)
+            Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString);
+            CNetComm.Instance.SendVariantUpdate(roomName, variant, VariantUpdateData.Operation.REMOVE);
         }
 
         private static void RandomizeNewVariants()
@@ -134,12 +134,12 @@ namespace Celeste.Mod.ARandomizerMod
             foreach (Variant variant in variantsToAdd )
             {
                 variant.SetValue();
-                TriggerVariant(variant);
+                AddVariantToCurrentRoom(variant);
             }
 
             for (int i = 0; i < numVariantsToRemove; i++)
             {
-                //ResetRandomVariant();
+                //ResetRandomVariant
             }
         }
 
@@ -161,7 +161,23 @@ namespace Celeste.Mod.ARandomizerMod
             }
         }
 
-        public static void TriggerVariant(Variant variant)
+        public static Variant GetVariantWithName(string name)
+        {
+            foreach (Variant variant in ActiveVariants)
+            {
+                if (variant.name.Equals(name))
+                {
+                    return variant;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Locally triggers a variant. To be used only when matching variant list, not triggering new variants
+        /// </summary>
+        /// <param name="variant"></param>
+        private static void TriggerVariant(Variant variant)
         {
             Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Activating variant " + variant.name + "...");
             if (!variant.Trigger())
@@ -179,19 +195,11 @@ namespace Celeste.Mod.ARandomizerMod
             ActiveVariants.AddLast(variant);
         }
 
-        public static Variant GetVariantWithName(string name)
-        {
-            foreach (Variant variant in ActiveVariants)
-            {
-                if (variant.name.Equals(name))
-                {
-                    return variant;
-                }
-            }
-            return null;
-        }
-
-        public static void ResetVariant(Variant variant)
+        /// <summary>
+        /// Locally resets a variant. To be used only when matching variant list, not removing variants
+        /// </summary>
+        /// <param name="variant"></param>
+        private static void ResetVariant(Variant variant)
         {
             Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Resetting variant " + variant.name + "...");
 
@@ -199,37 +207,6 @@ namespace Celeste.Mod.ARandomizerMod
                 return;
 
             ActiveVariants.Remove(variant);
-        }
-
-        public static void ResetRandomVariant()
-        {
-            if (ActiveVariants.Count < 1) return;
-
-            int variantToReset = new Random().Next(ActiveVariants.Count);
-            LinkedListNode<Variant> node = ActiveVariants.First;
-            for (int i = 0; i < ActiveVariants.Count; i++)
-            {
-                if (i >= variantToReset && node.Value.Cost < 200)
-                {
-                    ResetVariant(node.Value);
-                    return;
-                }
-
-                if (node.Next == null) return;
-                node = node.Next;
-            }
-        }
-
-        public static void ResetAllVariants()
-        {
-            Variant[] variantsToReset = ActiveVariants.ToArray();
-
-            foreach (Variant variant in variantsToReset)
-            {
-                ResetVariant(variant);
-            }
-
-            ActiveVariants.Clear();
         }
 
         private static void TestAllVariants()
