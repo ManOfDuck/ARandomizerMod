@@ -26,8 +26,20 @@ namespace Celeste.Mod.ARandomizerMod
             }
             else
             {
-                // Add new variants
-                RandomizeNewVariants();
+                // Add current variants to this room on all clients
+                foreach (Variant variant in ActiveVariants)
+                {
+                    SendNewVariantInCurrentRoom(variant);
+                }
+
+                LinkedList<Variant> variantsToAdd = VariantRandomizer.RollNewVariants();
+
+                // Add new variants to this room
+                foreach (Variant variant in variantsToAdd)
+                {
+                    variant.SetValue();
+                    SendNewVariantInCurrentRoom(variant);
+                }
             }
         }
 
@@ -44,12 +56,18 @@ namespace Celeste.Mod.ARandomizerMod
                 {
                     case VariantUpdateData.Operation.ADD:
                         Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Received variant " + variant.name + " with value " + variant.valueString);
-                        AddVariantToAllRooms(variant);
+                        foreach (string name in VariantsByRoomName.Keys)
+                        {
+                            VariantsByRoomName[name].AddLast(variant);
+                        }
                         TriggerVariant(variant);
                         break;
                     case VariantUpdateData.Operation.REMOVE:
                         Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Received reset of variant " + variant.name);
-                        RemoveVariantFromAllRooms(variant);
+                        foreach (string name in VariantsByRoomName.Keys)
+                        {
+                            VariantsByRoomName[name].Remove(variant);
+                        }
                         ResetVariant(variant);
                         break;
                     default:
@@ -88,60 +106,36 @@ namespace Celeste.Mod.ARandomizerMod
             }
         }
 
-        public static void AddVariantToCurrentRoom(Variant variant)
+        public static void SendNewVariantInCurrentRoom(Variant variant)
         {
-            AddVariantToRoom(variant, currentRoom.Name);
+            SendNewVariant(variant, currentRoom.Name);
         }
 
-        public static void RemoveVariantFromCurrentRoom(Variant variant) 
+        public static void SendVariantRemovalInCurrentRoom(Variant variant) 
         { 
-            RemoveVariantFromRoom(variant, currentRoom.Name);
+            SendVariantRemoval(variant, currentRoom.Name);
         }
 
-        public static void AddVariantToAllRooms(Variant variant)
+        public static void SendNewVariantInAllRooms(Variant variant)
         {
-            foreach (string roomName in VariantsByRoomName.Keys)
-            {
-                AddVariantToRoom(variant, roomName);
-            }
+            SendNewVariant(variant, AllRoomsIdentifier);
         }
 
-        public static void RemoveVariantFromAllRooms(Variant variant)
+        public static void SendVariantRemovalInAllRooms(Variant variant)
         {
-            foreach (string roomName in VariantsByRoomName.Keys)
-            {
-                RemoveVariantFromRoom(variant, roomName);
-            }
-
+            SendVariantRemoval(variant, AllRoomsIdentifier);
         }
 
-        public static void AddVariantToRoom(Variant variant, string roomName)
+        public static void SendNewVariant(Variant variant, string roomName)
         {
             Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending variant " + variant.name + " with value " + variant.valueString);
             CNetComm.Instance.SendVariantUpdate(roomName, variant, VariantUpdateData.Operation.ADD);
         }
 
-        public static void RemoveVariantFromRoom(Variant variant, string roomName)
+        public static void SendVariantRemoval(Variant variant, string roomName)
         {
             Logger.Log(LogLevel.Info, nameof(ARandomizerModModule), "Sending reset on variant " + variant.name);
             CNetComm.Instance.SendVariantUpdate(roomName, variant, VariantUpdateData.Operation.REMOVE);
-        }
-
-        private static void RandomizeNewVariants()
-        {
-            LinkedList<Variant> variantsToAdd = VariantRandomizer.RollNewVariants();
-            int numVariantsToRemove = VariantRandomizer.RollRemovedVariants();
-
-            foreach (Variant variant in variantsToAdd )
-            {
-                variant.SetValue();
-                AddVariantToCurrentRoom(variant);
-            }
-
-            for (int i = 0; i < numVariantsToRemove; i++)
-            {
-                //ResetRandomVariant
-            }
         }
 
         private static void MatchVariantList(LinkedList<Variant> targetList)

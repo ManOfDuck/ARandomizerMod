@@ -49,7 +49,8 @@ namespace Celeste.Mod.ARandomizerMod
         public static void PurchaseVariantRemoval(Variant variant)
         {
             Money -= variant.Cost;
-            CNetComm.Instance.SendVariantUpdate(VariantManager.AllRoomsIdentifier, variant, CelesteNet.Data.VariantUpdateData.Operation.REMOVE);
+            Logger.Log(LogLevel.Debug, nameof(ARandomizerModModule), "Purchased variant removal of variant " + variant);
+            VariantManager.SendVariantRemovalInAllRooms(variant);
         }
     }
 }
