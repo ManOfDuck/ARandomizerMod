@@ -17,4 +17,4 @@ Installation:
   - If Olympus doesn't install it automatically, navigate to the mods folder (manage installed mods > open mods folder) and drag the .zip in manually
 - Everest can automatically install the necessary dependencies, visit mod options in-game to do so
 
-
+hi!
